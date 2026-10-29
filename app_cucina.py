@@ -1,0 +1,412 @@
+# -*- coding: utf-8 -*-
+import streamlit as st
+import sqlite3
+import os
+import base64
+from PIL import Image
+
+# Ottiene automaticamente il percorso della cartella in cui si trova questo script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Configurazione pagina Streamlit
+st.set_page_config(page_title="Il Mio Ricettario", page_icon="🍳", layout="wide")
+
+# Percorsi salvataggi all'interno della cartella
+MEDIA_DIR = os.path.join(BASE_DIR, "media_cucina")
+if not os.path.exists(MEDIA_DIR):
+    os.makedirs(MEDIA_DIR)
+
+DB_PATH = os.path.join(BASE_DIR, "ricettario.db")
+
+# --- FUNZIONE PER RIDIMENSIONARE E SALVARE LE IMMAGINI (CORRETTA) ---
+def save_uploaded_image(immagine_file):
+    if immagine_file is not None:
+        img_name = immagine_file.name
+        img_path = os.path.join(MEDIA_DIR, img_name)
+        img = Image.open(immagine_file)
+        
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+            
+        max_size = (1000, 1000)
+        img.thumbnail(max_size)
+        
+        img.save(img_path, "JPEG", optimize=True, quality=85)
+        # Salva solo il percorso relativo pulito, indipendente dal disco D:
+        return f"media_cucina/{img_name}"
+    return ""
+
+# --- FUNZIONI PER IMPOSTARE LO SFONDO ---
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_png_as_page_bg(png_file):
+    bin_str = get_base64_of_bin_file(png_file)
+    page_bg_img = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpeg;base64,{bin_str}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }}
+    </style>
+    """
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# --- INIZIALIZZAZIONE DATABASE SQLITE ---
+def get_connection():
+    conn = sqlite3.connect(DB_PATH)
+    return conn
+
+def init_db():
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS ricette 
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                 titolo TEXT, 
+                 categoria TEXT, 
+                 ingredienti TEXT, 
+                 procedimento TEXT, 
+                 curiosita TEXT,
+                 fonte_url TEXT, 
+                 immagine TEXT)''')
+    
+    c.execute("PRAGMA table_info(ricette)")
+    columns = [column[1] for column in c.fetchall()]
+    if "curiosita" not in columns:
+        c.execute("ALTER TABLE ricette ADD COLUMN curiosita TEXT")
+
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE ---
+def mostra_categoria(nome_categoria):
+    st.header(f"📖 Raccolta: {nome_categoria}")
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT id, titolo, ingredienti, procedimento, curiosita, fonte_url, immagine FROM ricette WHERE categoria = ? ORDER BY id DESC", (nome_categoria,))
+    ricette = c.fetchall()
+    conn.close()
+
+    if ricette:
+        st.sidebar.subheader(f"📋 Elenco {nome_categoria}")
+        titles = [r[1] for r in ricette]
+        scelta_ricetta = st.sidebar.radio(f"Scegli {nome_categoria}:", ["Visualizza Tutti"] + titles, key=f"sb_{nome_categoria}")
+        
+        if scelta_ricetta == "Visualizza Tutti":
+            for item_id, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path in ricette:
+                with st.expander(titolo):
+                    # Controllo sicuro del percorso dell'immagine (funziona ovunque)
+                    if img_path:
+                        nome_file_img = os.path.basename(img_path)
+                        full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
+                        if os.path.exists(full_img_path):
+                            st.image(full_img_path, use_container_width=True)
+                    
+                    st.markdown("### 🛒 Ingredienti")
+                    st.text(ingredienti)
+                    
+                    st.markdown("### 👩‍🍳 Procedimento")
+                    st.text(procedimento)
+                    
+                    if curiosita:
+                        st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita}")
+                    
+                    if fonte_url:
+                        st.markdown(f"🔗 **Fonte originale:** [{fonte_url}]({fonte_url})")
+        else:
+            for item_id, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path in ricette:
+                if titolo == scelta_ricetta:
+                    st.subheader(titolo)
+                    if img_path:
+                        nome_file_img = os.path.basename(img_path)
+                        full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
+                        if os.path.exists(full_img_path):
+                            st.image(full_img_path, use_container_width=True)
+                    
+                    st.markdown("### 🛒 Ingredienti")
+                    st.text(ingredienti)
+                    
+                    st.markdown("### 👩‍🍳 Procedimento")
+                    st.text(procedimento)
+                    
+                    if curiosita:
+                        st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita}")
+                    
+                    if fonte_url:
+                        st.markdown(f"🔗 **Fonte originale:** [{fonte_url}]({fonte_url})")
+    else:
+        st.info(f"Nessuna ricetta inserita in '{nome_categoria}' al momento.")
+
+# --- GESTIONE STATO SESSIONE (LOGIN) ---
+if "autenticato" not in st.session_state:
+    st.session_state.autenticato = False
+
+# --- MENU E AREA RISERVATA NELLA SIDEBAR ---
+st.sidebar.title("📌 Navigazione")
+scelta_pagina = st.sidebar.radio("Scegli la sezione:", [
+    "🏠 Home",
+    "🥗 Antipasti", 
+    "🍝 Primi", 
+    "🥩 Secondi", 
+    "🍰 Dolci", 
+    "🍹 Altro",
+    "⚙️ Area Gestione (Inserisci/Modifica)"
+])
+
+st.sidebar.markdown("---")
+st.sidebar.title("🔒 Area Riservata")
+PASSWORD_CORRETTA = "1234"
+
+if not st.session_state.autenticato:
+    with st.sidebar.form("form_login_sidebar"):
+        password_inserita = st.text_input("Password Amministratore", type="password")
+        submit_login = st.form_submit_button("Accedi")
+        
+        if submit_login:
+            if password_inserita == PASSWORD_CORRETTA:
+                st.session_state.autenticato = True
+                st.success("Accesso effettuato!")
+                st.rerun()
+            else:
+                st.error("Password errata.")
+else:
+    st.sidebar.success("✅ Amministratore Connesso")
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.autenticato = False
+        st.rerun()
+
+st.sidebar.markdown("---")
+
+# --- GESTIONE PAGINE PRINCIPALI ---
+if scelta_pagina == "🏠 Home":
+    bg_path = os.path.join(MEDIA_DIR, "background.jpg")
+    if os.path.exists(bg_path):
+        set_png_as_page_bg(bg_path)
+
+    st.markdown(
+        """
+        <div style="background-color: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #fae5d3; margin-bottom: 20px;">
+            <h1 style="color: #b9770e; font-family: sans-serif; margin-bottom: 5px;">🍳 Il Mio Ricettario Personale</h1>
+            <p style="font-size: 1.2rem; color: #555; font-style: italic; margin: 0;">"Il segreto della cucina è l'amore... e un buon archivio portatile!"</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Antipasti' ORDER BY id DESC LIMIT 1")
+    res_ant = c.fetchone()
+    num_ant = res_ant[0] if res_ant else 0
+    ultima_ant = res_ant[1] if res_ant and res_ant[1] else "Nessuna"
+
+    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Primi' ORDER BY id DESC LIMIT 1")
+    res_pri = c.fetchone()
+    num_pri = res_pri[0] if res_pri else 0
+    ultima_pri = res_pri[1] if res_pri and res_pri[1] else "Nessuna"
+
+    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Secondi' ORDER BY id DESC LIMIT 1")
+    res_sec = c.fetchone()
+    num_sec = res_sec[0] if res_sec else 0
+    ultima_sec = res_sec[1] if res_sec and res_sec[1] else "Nessuna"
+
+    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Dolci' ORDER BY id DESC LIMIT 1")
+    res_dol = c.fetchone()
+    num_dol = res_dol[0] if res_dol else 0
+    ultima_dol = res_dol[1] if res_dol and res_dol[1] else "Nessuna"
+
+    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Altro' ORDER BY id DESC LIMIT 1")
+    res_alt = c.fetchone()
+    num_alt = res_alt[0] if res_alt else 0
+    ultima_alt = res_alt[1] if res_alt and res_alt[1] else "Nessuna"
+
+    conn.close()
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        st.markdown(
+            f"""
+            <div style="border: 2px solid #d4edda; background-color: rgba(248, 255, 249, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
+                <h4 style="margin:0;">🥗 Antipasti</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #28a745; margin: 8px 0;">{num_ant} inseriti</p>
+                <p style="font-size: 0.75rem; color: #666;">Ultima:<br><b>{ultima_ant}</b></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col2:
+        st.markdown(
+            f"""
+            <div style="border: 2px solid #d1ecf1; background-color: rgba(240, 248, 255, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
+                <h4 style="margin:0;">🍝 Primi</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #17a2b8; margin: 8px 0;">{num_pri} inseriti</p>
+                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_pri}</b></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col3:
+        st.markdown(
+            f"""
+            <div style="border: 2px solid #f8d7da; background-color: rgba(255, 248, 248, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
+                <h4 style="margin:0;">🥩 Secondi</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #dc3545; margin: 8px 0;">{num_sec} inseriti</p>
+                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_sec}</b></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col4:
+        st.markdown(
+            f"""
+            <div style="border: 2px solid #fff3cd; background-color: rgba(255, 253, 245, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
+                <h4 style="margin:0;">🍰 Dolci</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #ffc107; margin: 8px 0;">{num_dol} inseriti</p>
+                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_dol}</b></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col5:
+        st.markdown(
+            f"""
+            <div style="border: 2px solid #e2d9f3; background-color: rgba(249, 245, 255, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
+                <h4 style="margin:0;">🍹 Altro</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #6f42c1; margin: 8px 0;">{num_alt} inseriti</p>
+                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_alt}</b></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    st.markdown(
+        """
+        <div style="background-color: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 10px; border: 1px solid #fae5d3;">
+            <p style="color: #333; margin: 0; text-align: center;">💡 <b>Come iniziare:</b> Usa il menu a sinistra per sfogliare le categorie o vai in 'Area Gestione' per incollare nuove ricette e caricare le foto!</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+elif scelta_pagina == "🥗 Antipasti":
+    mostra_categoria("Antipasti")
+
+elif scelta_pagina == "🍝 Primi":
+    mostra_categoria("Primi")
+
+elif scelta_pagina == "🥩 Secondi":
+    mostra_categoria("Secondi")
+
+elif scelta_pagina == "🍰 Dolci":
+    mostra_categoria("Dolci")
+
+elif scelta_pagina == "🍹 Altro":
+    mostra_categoria("Altro")
+
+elif scelta_pagina == "⚙️ Area Gestione (Inserisci/Modifica)":
+    st.header("⚙️ Gestione Ricettario")
+    
+    if not st.session_state.autenticato:
+        st.warning("🔒 **Area Protetta**: Inserisci la password amministratore nella barra laterale sinistra per gestire le ricette.")
+    else:
+        st.success("✅ Accesso amministrativo attivo.")
+        st.markdown("---")
+        
+        modo_gestione = st.radio("Seleziona operazione:", ["➕ Incolla / Inserisci Nuova Ricetta", "✏️ Modifica o Elimina Esistente"])
+
+        # INSERISCI NUOVA
+        if modo_gestione == "➕ Incolla / Inserisci Nuova Ricetta":
+            with st.form("form_nuova_ricetta"):
+                st.markdown("### 📝 Incolla i dettagli della ricetta")
+                titolo = st.text_input("Titolo della Ricetta (es. Liquore al limone, Pesto, ecc.)")
+                categoria = st.selectbox("Categoria", ["Antipasti", "Primi", "Secondi", "Dolci", "Altro"])
+                
+                ingredienti = st.text_area("Incolla qui gli Ingredienti (copiati dal web)")
+                procedimento = st.text_area("Incolla qui il Procedimento (copiato dal web)")
+                curiosita = st.text_area("Curiosità o Segreto dello Chef (opzionale)")
+                
+                fonte_url = st.text_input("Link del sito web di origine (opzionale)")
+                immagine_file = st.file_uploader("Carica la foto della ricetta", type=["jpg", "jpeg", "png", "webp"])
+                
+                submit = st.form_submit_button("Salva Ricetta nel Database")
+
+                if submit and titolo and ingredienti and procedimento:
+                    img_path = save_uploaded_image(immagine_file)
+                    conn = get_connection()
+                    c = conn.cursor()
+                    c.execute("INSERT INTO ricette (titolo, categoria, ingredienti, procedimento, curiosita, fonte_url, immagine) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                              (titolo, categoria, ingredienti, procedimento, curiosita, fonte_url, img_path))
+                    conn.commit()
+                    conn.close()
+                    st.success("Ricetta salvata con successo sul tuo ricettario portatile!")
+
+        # MODIFICA O ELIMINA
+        elif modo_gestione == "✏️ Modifica o Elimina Esistente":
+            cat_mod = st.selectbox("Seleziona categoria da modificare:", ["Antipasti", "Primi", "Secondi", "Dolci", "Altro"])
+            conn = get_connection()
+            c = conn.cursor()
+            c.execute("SELECT id, titolo, categoria, ingredienti, procedimento, curiosita, fonte_url, immagine FROM ricette WHERE categoria = ?", (cat_mod,))
+            elementi = c.fetchall()
+            conn.close()
+
+            if elementi:
+                mapping = {elem[1]: elem for elem in elementi}
+                scelta_titolo = st.selectbox("Scegli quale ricetta modificare:", list(mapping.keys()))
+                item_id, current_title, current_cat, current_ing, current_proc, current_cur, current_url, current_img = mapping[scelta_titolo]
+
+                with st.form("form_modifica_ricetta"):
+                    nuovo_titolo = st.text_input("Modifica Titolo", value=current_title)
+                    nuova_categoria = st.selectbox("Modifica Categoria", ["Antipasti", "Primi", "Secondi", "Dolci", "Altro"], index=["Antipasti", "Primi", "Secondi", "Dolci", "Altro"].index(current_cat))
+                    nuovi_ingredienti = st.text_area("Modifica Ingredienti", value=current_ing)
+                    nuovo_procedimento = st.text_area("Modifica Procedimento", value=current_proc)
+                    nuova_curiosita = st.text_area("Modifica Curiosità / Segreto", value=current_cur if current_cur else "")
+                    nuovo_url = st.text_input("Modifica Link Fonte", value=current_url if current_url else "")
+                    
+                    if current_img:
+                        nome_file_img = os.path.basename(current_img)
+                        full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
+                        if os.path.exists(full_img_path):
+                            st.image(full_img_path, width=150)
+                    
+                    nuova_immagine_file = st.file_uploader("Sostituisci foto (lascia vuoto per non cambiare)", type=["jpg", "jpeg", "png", "webp"])
+                    rimuovi_img = st.checkbox("Elimina foto esistente")
+
+                    col1, col2 = st.columns(2)
+                    salva_modifiche = col1.form_submit_button("Salva Modifiche")
+                    elimina_item = col2.form_submit_button("Elimina Ricetta")
+
+                    conn = get_connection()
+                    c = conn.cursor()
+                    if salva_modifiche:
+                        img_path = current_img
+                        if rimuovi_img:
+                            img_path = ""
+                        elif nuova_immagine_file is not None:
+                            img_path = save_uploaded_image(nuova_immagine_file)
+
+                        c.execute("UPDATE ricette SET titolo = ?, categoria = ?, ingredienti = ?, procedimento = ?, curiosita = ?, fonte_url = ?, immagine = ? WHERE id = ?", 
+                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
+                        conn.commit()
+                        conn.close()
+                        st.success("Ricetta aggiornata con successo! Ricarica la pagina.")
+                    elif elimina_item:
+                        c.execute("DELETE FROM ricette WHERE id = ?", (item_id,))
+                        conn.commit()
+                        conn.close()
+                        st.success("Ricetta eliminata con successo! Ricarica la pagina.")
+            else:
+                st.info("Nessuna ricetta disponibile in questa categoria per la modifica.")

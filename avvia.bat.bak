@@ -1,0 +1,6 @@
+@echo off
+title Avvio Ricettario Portatile
+D:
+cd \cucina
+python -m streamlit run app_cucina.py
+pause
