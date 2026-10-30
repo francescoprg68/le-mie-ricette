@@ -21,7 +21,6 @@ DB_PATH = os.path.join(BASE_DIR, "ricettario.db")
 # --- FUNZIONE UNIVERSALE PER SALVARE E CONVERTIRE QUALSIASI IMMAGINE (ANCHE JFIF) ---
 def save_uploaded_image(immagine_file):
     if immagine_file is not None:
-        # Pulisce il nome del file e gestisce le estensioni anomale come .jfif
         img_name = immagine_file.name
         if img_name.lower().endswith('.jfif'):
             img_name = os.path.splitext(img_name)[0] + ".jpg"
@@ -31,7 +30,6 @@ def save_uploaded_image(immagine_file):
         try:
             img = Image.open(immagine_file)
             
-            # Converte l'immagine in RGB per rimuovere trasparenze o formati particolari
             if img.mode in ("RGBA", "P", "LA"):
                 img = img.convert("RGB")
                 
@@ -45,7 +43,7 @@ def save_uploaded_image(immagine_file):
             return ""
     return ""
 
-# --- CONFIGURAZIONE GRAFICA (SFONDO CREMA, BOX AZZURRINI SOFT E TITOLI IN GRASSETTO) ---
+# --- CONFIGURAZIONE GRAFICA (CARATTERI PIÙ GRANDI E LEGGIBILI) ---
 def imposta_stile_grafico():
     stile_css = """
     <style>
@@ -70,6 +68,10 @@ def imposta_stile_grafico():
         margin-bottom: 20px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     }
+    /* Aumenta la dimensione generale del testo all'interno dell'app per una lettura comodissima */
+    html, body, [class*="st-"] {
+        font-size: 1.12rem !important;
+    }
     /* Mostra SEMPRE la foto completa (senza tagli) */
     div[data-testid="stImage"] img {
         max-height: 400px !important;
@@ -84,10 +86,10 @@ def imposta_stile_grafico():
         padding: 5px;
         border: 1px solid #C8D8ED;
     }
-    /* Grassetto marcato per i titoli all'interno degli expander (elenco ricette) */
+    /* Titoli delle ricette negli expander belli grandi e in grassetto marcato */
     .streamlit-expanderHeader p {
         font-weight: bold !important;
-        font-size: 1.05rem !important;
+        font-size: 1.2rem !important;
         color: #1a365d !important;
     }
     /* Blocca qualsiasi effetto di trasparenza o sbiadimento al tocco/mouse */
@@ -100,6 +102,7 @@ def imposta_stile_grafico():
         color: #333333 !important;
         border: 1px solid #B0C6E2 !important;
         font-weight: bold;
+        font-size: 1.05rem !important;
         border-radius: 10px;
     }
     .stButton button:hover {
@@ -236,7 +239,7 @@ if st.session_state.pagina_corrente == "🏠 Home":
         """
         <div style="background-color: #E6EEF8; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #C8D8ED; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
             <h1 style="color: #b9770e; font-family: sans-serif; margin-bottom: 5px;">🍳 Il Mio Ricettario Personale</h1>
-            <p style="font-size: 1.1rem; color: #555; font-style: italic; margin: 0;">"Il segreto della cucina è l'amore... e un buon archivio portatile!"</p>
+            <p style="font-size: 1.2rem; color: #555; font-style: italic; margin: 0;">"Il segreto della cucina è l'amore... e un buon archivio portatile!"</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -323,10 +326,10 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col1:
         st.markdown(
             f"""
-            <div style="border: 2px solid #d4edda; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222;">🥗 Antipasti</h4>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #28a745; margin: 6px 0;">{num_ant} inseriti</p>
-                <p style="font-size: 0.75rem; color: #666;">Ultima:<br><b>{ultima_ant}</b></p>
+            <div style="border: 2px solid #d4edda; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🥗 Antipasti</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #28a745; margin: 6px 0;">{num_ant} inseriti</p>
+                <p style="font-size: 0.85rem; color: #666;">Ultima:<br><b>{ultima_ant}</b></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -338,10 +341,10 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col2:
         st.markdown(
             f"""
-            <div style="border: 2px solid #d1ecf1; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222;">🍝 Primi</h4>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #17a2b8; margin: 6px 0;">{num_pri} inseriti</p>
-                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_pri}</b></p>
+            <div style="border: 2px solid #d1ecf1; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍝 Primi</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #17a2b8; margin: 6px 0;">{num_pri} inseriti</p>
+                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_pri}</b></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -353,10 +356,10 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col3:
         st.markdown(
             f"""
-            <div style="border: 2px solid #f8d7da; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222;">🥩 Secondi</h4>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #dc3545; margin: 6px 0;">{num_sec} inseriti</p>
-                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_sec}</b></p>
+            <div style="border: 2px solid #f8d7da; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🥩 Secondi</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #dc3545; margin: 6px 0;">{num_sec} inseriti</p>
+                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_sec}</b></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -368,10 +371,10 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col4:
         st.markdown(
             f"""
-            <div style="border: 2px solid #fff3cd; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222;">🍰 Dolci</h4>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #ffc107; margin: 6px 0;">{num_dol} inseriti</p>
-                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_dol}</b></p>
+            <div style="border: 2px solid #fff3cd; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍰 Dolci</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #ffc107; margin: 6px 0;">{num_dol} inseriti</p>
+                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_dol}</b></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -383,10 +386,10 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col5:
         st.markdown(
             f"""
-            <div style="border: 2px solid #e2d9f3; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222;">🍹 Altro</h4>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #6f42c1; margin: 6px 0;">{num_alt} inseriti</p>
-                <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_alt}</b></p>
+            <div style="border: 2px solid #e2d9f3; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍹 Altro</h4>
+                <p style="font-size: 1.2rem; font-weight: bold; color: #6f42c1; margin: 6px 0;">{num_alt} inseriti</p>
+                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_alt}</b></p>
             </div>
             """,
             unsafe_allow_html=True
@@ -450,7 +453,6 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
                 curiosita = st.text_area("Curiosità o Segreto dello Chef (opzionale)")
                 
                 fonte_url = st.text_input("Link del sito web di origine (opzionale)")
-                # Ora accetta qualsiasi estensione d'immagine inclusi .jfif, .webp, .png, .jpg
                 immagine_file = st.file_uploader("Carica la foto della ricetta", type=["jpg", "jpeg", "png", "webp", "jfif"])
                 
                 submit = st.form_submit_button("Salva Ricetta nel Database")
@@ -510,7 +512,7 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
                             img_path = save_uploaded_image(nuova_immagine_file)
 
                         c.execute("UPDATE ricette SET titolo = ?, categoria = ?, ingredienti = ?, procedimento = ?, curiosita = ?, fonte_url = ?, immagine = ? WHERE id = ?", 
-                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
+                                  (nuovo_titolo, nueva_categoria if 'nuova_categoria' in locals() else nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
                         conn.commit()
                         conn.close()
                         st.success("Ricetta aggiornata con successo! Ricarica la pagina.")
