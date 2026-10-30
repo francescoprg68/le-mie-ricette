@@ -8,7 +8,7 @@ from PIL import Image
 # Ottiene automaticamente il percorso della cartella in cui si trova questo script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Configurazione pagina Streamlit
+# Configurazione pagina Streamlit (layout wide a tutto schermo)
 st.set_page_config(page_title="Il Mio Ricettario", page_icon="🍳", layout="wide")
 
 # Percorsi salvataggi all'interno della cartella
@@ -18,43 +18,101 @@ if not os.path.exists(MEDIA_DIR):
 
 DB_PATH = os.path.join(BASE_DIR, "ricettario.db")
 
-# --- FUNZIONE PER RIDIMENSIONARE E SALVARE LE IMMAGINI (CORRETTA) ---
+# --- FUNZIONE UNIVERSALE PER SALVARE E CONVERTIRE QUALSIASI IMMAGINE (ANCHE JFIF) ---
 def save_uploaded_image(immagine_file):
     if immagine_file is not None:
+        # Pulisce il nome del file e gestisce le estensioni anomale come .jfif
         img_name = immagine_file.name
-        img_path = os.path.join(MEDIA_DIR, img_name)
-        img = Image.open(immagine_file)
-        
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
+        if img_name.lower().endswith('.jfif'):
+            img_name = os.path.splitext(img_name)[0] + ".jpg"
             
-        max_size = (1000, 1000)
-        img.thumbnail(max_size)
+        img_path = os.path.join(MEDIA_DIR, img_name)
         
-        img.save(img_path, "JPEG", optimize=True, quality=85)
-        # Salva solo il percorso relativo pulito, indipendente dal disco D:
-        return f"media_cucina/{img_name}"
+        try:
+            img = Image.open(immagine_file)
+            
+            # Converte l'immagine in RGB per rimuovere trasparenze o formati particolari
+            if img.mode in ("RGBA", "P", "LA"):
+                img = img.convert("RGB")
+                
+            max_size = (1000, 1000)
+            img.thumbnail(max_size)
+            
+            img.save(img_path, "JPEG", optimize=True, quality=85)
+            return f"media_cucina/{img_name}"
+        except Exception as e:
+            st.error(f"Errore nel caricamento dell'immagine: {e}")
+            return ""
     return ""
 
-# --- FUNZIONI PER IMPOSTARE LO SFONDO ---
-def get_base64_of_bin_file(bin_file):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-
-def set_png_as_page_bg(png_file):
-    bin_str = get_base64_of_bin_file(png_file)
-    page_bg_img = f"""
+# --- CONFIGURAZIONE GRAFICA (SFONDO CREMA, BOX AZZURRINI SOFT E TITOLI IN GRASSETTO) ---
+def imposta_stile_grafico():
+    stile_css = """
     <style>
-    .stApp {{
-        background-image: url("data:image/jpeg;base64,{bin_str}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }}
+    /* Sfondo generale più caldo e meno accecante (Color Sabbia/Crema Accogliente) */
+    .stApp {
+        background-color: #F4F1EA !important;
+    }
+    /* Nasconde completamente la barra laterale e il suo pulsante di apertura */
+    [data-testid="stSidebar"] {
+        display: none;
+    }
+    [data-testid="collapsedControl"] {
+        display: none;
+    }
+    /* Contenitore principale con un azzurrino pastello molto più soft e riposante */
+    div.block-container {
+        background-color: #E6EEF8;
+        padding: 30px;
+        border-radius: 20px;
+        border: 2px solid #C8D8ED;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    /* Mostra SEMPRE la foto completa (senza tagli) */
+    div[data-testid="stImage"] img {
+        max-height: 400px !important;
+        width: auto !important;
+        max-width: 100% !important;
+        object-fit: contain !important;
+        border-radius: 12px !important;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #F0F5FC;
+        padding: 5px;
+        border: 1px solid #C8D8ED;
+    }
+    /* Grassetto marcato per i titoli all'interno degli expander (elenco ricette) */
+    .streamlit-expanderHeader p {
+        font-weight: bold !important;
+        font-size: 1.05rem !important;
+        color: #1a365d !important;
+    }
+    /* Blocca qualsiasi effetto di trasparenza o sbiadimento al tocco/mouse */
+    div[data-testid="column"], div[data-testid="column"] *, div[data-testid="column"]:hover {
+        opacity: 1 !important;
+    }
+    .stButton button {
+        opacity: 1 !important;
+        background-color: #FFFFFF !important;
+        color: #333333 !important;
+        border: 1px solid #B0C6E2 !important;
+        font-weight: bold;
+        border-radius: 10px;
+    }
+    .stButton button:hover {
+        opacity: 1 !important;
+        background-color: #D6E4FC !important;
+        color: #b9770e !important;
+        border-color: #b9770e !important;
+    }
     </style>
     """
-    st.markdown(page_bg_img, unsafe_allow_html=True)
+    st.markdown(stile_css, unsafe_allow_html=True)
+
+imposta_stile_grafico()
 
 # --- INIZIALIZZAZIONE DATABASE SQLITE ---
 def get_connection():
@@ -66,13 +124,13 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS ricette 
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                 titolo TEXT, 
-                 categoria TEXT, 
-                 ingredienti TEXT, 
-                 procedimento TEXT, 
-                 curiosita TEXT,
-                 fonte_url TEXT, 
-                 immagine TEXT)''')
+                  titolo TEXT, 
+                  categoria TEXT, 
+                  ingredienti TEXT, 
+                  procedimento TEXT, 
+                  curiosita TEXT,
+                  fonte_url TEXT, 
+                  immagine TEXT)''')
     
     c.execute("PRAGMA table_info(ricette)")
     columns = [column[1] for column in c.fetchall()]
@@ -84,9 +142,27 @@ def init_db():
 
 init_db()
 
-# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE ---
+# --- GESTIONE STATO SESSIONE (NAVIGAZIONE E LOGIN) ---
+if "pagina_corrente" not in st.session_state:
+    st.session_state.pagina_corrente = "🏠 Home"
+
+if "autenticato" not in st.session_state:
+    st.session_state.autenticato = False
+
+if "mostra_login_inline" not in st.session_state:
+    st.session_state.mostra_login_inline = False
+
+# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE A TUTTO SCHERMO ---
 def mostra_categoria(nome_categoria):
-    st.header(f"📖 Raccolta: {nome_categoria}")
+    col_titolo, col_home = st.columns([4, 1])
+    with col_titolo:
+        st.header(f"📖 Raccolta: {nome_categoria}")
+    with col_home:
+        if st.button("🏠 Torna alla Home", key=f"btn_home_top_{nome_categoria}", use_container_width=True):
+            st.session_state.pagina_corrente = "🏠 Home"
+            st.session_state.mostra_login_inline = False
+            st.rerun()
+
     conn = get_connection()
     c = conn.cursor()
     c.execute("SELECT id, titolo, ingredienti, procedimento, curiosita, fonte_url, immagine FROM ricette WHERE categoria = ? ORDER BY id DESC", (nome_categoria,))
@@ -94,14 +170,14 @@ def mostra_categoria(nome_categoria):
     conn.close()
 
     if ricette:
-        st.sidebar.subheader(f"📋 Elenco {nome_categoria}")
         titles = [r[1] for r in ricette]
-        scelta_ricetta = st.sidebar.radio(f"Scegli {nome_categoria}:", ["Visualizza Tutti"] + titles, key=f"sb_{nome_categoria}")
+        scelta_ricetta = st.selectbox(f"Scegli una ricetta in {nome_categoria}:", ["Visualizza Tutti"] + titles, key=f"sb_main_{nome_categoria}")
         
+        st.markdown("<br>", unsafe_allow_html=True)
+
         if scelta_ricetta == "Visualizza Tutti":
             for item_id, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path in ricette:
                 with st.expander(titolo):
-                    # Controllo sicuro del percorso dell'immagine (funziona ovunque)
                     if img_path:
                         nome_file_img = os.path.basename(img_path)
                         full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
@@ -140,64 +216,77 @@ def mostra_categoria(nome_categoria):
                     
                     if fonte_url:
                         st.markdown(f"🔗 **Fonte originale:** [{fonte_url}]({fonte_url})")
+
+        st.markdown("---")
+        if st.button("🏠 Torna alla Home", key=f"btn_home_bottom_{nome_categoria}", use_container_width=True):
+            st.session_state.pagina_corrente = "🏠 Home"
+            st.session_state.mostra_login_inline = False
+            st.rerun()
+
     else:
         st.info(f"Nessuna ricetta inserita in '{nome_categoria}' al momento.")
-
-# --- GESTIONE STATO SESSIONE (LOGIN) ---
-if "autenticato" not in st.session_state:
-    st.session_state.autenticato = False
-
-# --- MENU E AREA RISERVATA NELLA SIDEBAR ---
-st.sidebar.title("📌 Navigazione")
-scelta_pagina = st.sidebar.radio("Scegli la sezione:", [
-    "🏠 Home",
-    "🥗 Antipasti", 
-    "🍝 Primi", 
-    "🥩 Secondi", 
-    "🍰 Dolci", 
-    "🍹 Altro",
-    "⚙️ Area Gestione (Inserisci/Modifica)"
-])
-
-st.sidebar.markdown("---")
-st.sidebar.title("🔒 Area Riservata")
-PASSWORD_CORRETTA = "1234"
-
-if not st.session_state.autenticato:
-    with st.sidebar.form("form_login_sidebar"):
-        password_inserita = st.text_input("Password Amministratore", type="password")
-        submit_login = st.form_submit_button("Accedi")
-        
-        if submit_login:
-            if password_inserita == PASSWORD_CORRETTA:
-                st.session_state.autenticato = True
-                st.success("Accesso effettuato!")
-                st.rerun()
-            else:
-                st.error("Password errata.")
-else:
-    st.sidebar.success("✅ Amministratore Connesso")
-    if st.sidebar.button("🚪 Logout"):
-        st.session_state.autenticato = False
-        st.rerun()
-
-st.sidebar.markdown("---")
+        if st.button("🏠 Torna alla Home", key=f"btn_home_empty_{nome_categoria}", use_container_width=True):
+            st.session_state.pagina_corrente = "🏠 Home"
+            st.session_state.mostra_login_inline = False
+            st.rerun()
 
 # --- GESTIONE PAGINE PRINCIPALI ---
-if scelta_pagina == "🏠 Home":
-    bg_path = os.path.join(MEDIA_DIR, "background.jpg")
-    if os.path.exists(bg_path):
-        set_png_as_page_bg(bg_path)
-
+if st.session_state.pagina_corrente == "🏠 Home":
     st.markdown(
         """
-        <div style="background-color: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #fae5d3; margin-bottom: 20px;">
+        <div style="background-color: #E6EEF8; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #C8D8ED; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
             <h1 style="color: #b9770e; font-family: sans-serif; margin-bottom: 5px;">🍳 Il Mio Ricettario Personale</h1>
-            <p style="font-size: 1.2rem; color: #555; font-style: italic; margin: 0;">"Il segreto della cucina è l'amore... e un buon archivio portatile!"</p>
+            <p style="font-size: 1.1rem; color: #555; font-style: italic; margin: 0;">"Il segreto della cucina è l'amore... e un buon archivio portatile!"</p>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    # --- TASTO / BOX ACCESSO GESTIONE NELLA HOME ---
+    col_h1, col_h2, col_h3 = st.columns([1, 2, 1])
+    with col_h2:
+        if not st.session_state.autenticato:
+            if not st.session_state.mostra_login_inline:
+                if st.button("⚙️ Area Gestione & Inserisci Ricette", use_container_width=True, key="btn_apri_login"):
+                    st.session_state.mostra_login_inline = True
+                    st.rerun()
+            else:
+                with st.form("form_login_inline_home"):
+                    password_inserita = st.text_input("Password", type="password", key="pwd_inline", label_visibility="collapsed", placeholder="")
+                    col_f1, col_f2 = st.columns(2)
+                    submit_inline = col_f1.form_submit_button("Accedi", use_container_width=True)
+                    chiudi_inline = col_f2.form_submit_button("Chiudi", use_container_width=True)
+                    
+                    if submit_inline:
+                        if password_inserita == "1234":
+                            st.session_state.autenticato = True
+                            st.session_state.mostra_login_inline = False
+                            st.success("Accesso effettuato!")
+                            st.rerun()
+                        else:
+                            st.error("Password errata.")
+                    if chiudi_inline:
+                        st.session_state.mostra_login_inline = False
+                        st.rerun()
+        else:
+            st.markdown(
+                """
+                <div style="background-color: rgba(230, 248, 230, 0.98); padding: 15px; border-radius: 10px; border: 1px solid #28a745; text-align: center; margin-bottom: 10px;">
+                    <h4 style="margin:0; color: #28a745;">✅ Area Amministrativa Attiva</h4>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            col_lg1, col_lg2 = st.columns(2)
+            if col_lg1.button("➕ Gestisci / Inserisci", use_container_width=True, key="btn_vai_gestione_attiva"):
+                st.session_state.pagina_corrente = "⚙️ Gestione Ricette"
+                st.rerun()
+            if col_lg2.button("🚪 Logout", use_container_width=True, key="btn_logout_home"):
+                st.session_state.autenticato = False
+                st.session_state.mostra_login_inline = False
+                st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     conn = get_connection()
     c = conn.cursor()
@@ -234,96 +323,117 @@ if scelta_pagina == "🏠 Home":
     with col1:
         st.markdown(
             f"""
-            <div style="border: 2px solid #d4edda; background-color: rgba(248, 255, 249, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
-                <h4 style="margin:0;">🥗 Antipasti</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #28a745; margin: 8px 0;">{num_ant} inseriti</p>
+            <div style="border: 2px solid #d4edda; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222;">🥗 Antipasti</h4>
+                <p style="font-size: 1.1rem; font-weight: bold; color: #28a745; margin: 6px 0;">{num_ant} inseriti</p>
                 <p style="font-size: 0.75rem; color: #666;">Ultima:<br><b>{ultima_ant}</b></p>
             </div>
             """,
             unsafe_allow_html=True
         )
+        if st.button("👉 Apri Antipasti", use_container_width=True, key="btn_ant"):
+            st.session_state.pagina_corrente = "🥗 Antipasti"
+            st.rerun()
 
     with col2:
         st.markdown(
             f"""
-            <div style="border: 2px solid #d1ecf1; background-color: rgba(240, 248, 255, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
-                <h4 style="margin:0;">🍝 Primi</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #17a2b8; margin: 8px 0;">{num_pri} inseriti</p>
+            <div style="border: 2px solid #d1ecf1; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222;">🍝 Primi</h4>
+                <p style="font-size: 1.1rem; font-weight: bold; color: #17a2b8; margin: 6px 0;">{num_pri} inseriti</p>
                 <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_pri}</b></p>
             </div>
             """,
             unsafe_allow_html=True
         )
+        if st.button("👉 Apri Primi", use_container_width=True, key="btn_pri"):
+            st.session_state.pagina_corrente = "🍝 Primi"
+            st.rerun()
 
     with col3:
         st.markdown(
             f"""
-            <div style="border: 2px solid #f8d7da; background-color: rgba(255, 248, 248, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
-                <h4 style="margin:0;">🥩 Secondi</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #dc3545; margin: 8px 0;">{num_sec} inseriti</p>
+            <div style="border: 2px solid #f8d7da; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222;">🥩 Secondi</h4>
+                <p style="font-size: 1.1rem; font-weight: bold; color: #dc3545; margin: 6px 0;">{num_sec} inseriti</p>
                 <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_sec}</b></p>
             </div>
             """,
             unsafe_allow_html=True
         )
+        if st.button("👉 Apri Secondi", use_container_width=True, key="btn_sec"):
+            st.session_state.pagina_corrente = "🥩 Secondi"
+            st.rerun()
 
     with col4:
         st.markdown(
             f"""
-            <div style="border: 2px solid #fff3cd; background-color: rgba(255, 253, 245, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
-                <h4 style="margin:0;">🍰 Dolci</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #ffc107; margin: 8px 0;">{num_dol} inseriti</p>
+            <div style="border: 2px solid #fff3cd; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222;">🍰 Dolci</h4>
+                <p style="font-size: 1.1rem; font-weight: bold; color: #ffc107; margin: 6px 0;">{num_dol} inseriti</p>
                 <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_dol}</b></p>
             </div>
             """,
             unsafe_allow_html=True
         )
+        if st.button("👉 Apri Dolci", use_container_width=True, key="btn_dol"):
+            st.session_state.pagina_corrente = "🍰 Dolci"
+            st.rerun()
 
     with col5:
         st.markdown(
             f"""
-            <div style="border: 2px solid #e2d9f3; background-color: rgba(249, 245, 255, 0.9); padding: 15px; border-radius: 10px; text-align: center; height: 210px;">
-                <h4 style="margin:0;">🍹 Altro</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #6f42c1; margin: 8px 0;">{num_alt} inseriti</p>
+            <div style="border: 2px solid #e2d9f3; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 160px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                <h4 style="margin:0; color: #222;">🍹 Altro</h4>
+                <p style="font-size: 1.1rem; font-weight: bold; color: #6f42c1; margin: 6px 0;">{num_alt} inseriti</p>
                 <p style="font-size: 0.75rem; color: #666;">Ultimo:<br><b>{ultima_alt}</b></p>
             </div>
             """,
             unsafe_allow_html=True
         )
+        if st.button("👉 Apri Altro", use_container_width=True, key="btn_alt"):
+            st.session_state.pagina_corrente = "🍹 Altro"
+            st.rerun()
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    st.markdown(
-        """
-        <div style="background-color: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 10px; border: 1px solid #fae5d3;">
-            <p style="color: #333; margin: 0; text-align: center;">💡 <b>Come iniziare:</b> Usa il menu a sinistra per sfogliare le categorie o vai in 'Area Gestione' per incollare nuove ricette e caricare le foto!</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-elif scelta_pagina == "🥗 Antipasti":
+elif st.session_state.pagina_corrente == "🥗 Antipasti":
     mostra_categoria("Antipasti")
 
-elif scelta_pagina == "🍝 Primi":
+elif st.session_state.pagina_corrente == "🍝 Primi":
     mostra_categoria("Primi")
 
-elif scelta_pagina == "🥩 Secondi":
+elif st.session_state.pagina_corrente == "🥩 Secondi":
     mostra_categoria("Secondi")
 
-elif scelta_pagina == "🍰 Dolci":
+elif st.session_state.pagina_corrente == "🍰 Dolci":
     mostra_categoria("Dolci")
 
-elif scelta_pagina == "🍹 Altro":
+elif st.session_state.pagina_corrente == "🍹 Altro":
     mostra_categoria("Altro")
 
-elif scelta_pagina == "⚙️ Area Gestione (Inserisci/Modifica)":
-    st.header("⚙️ Gestione Ricettario")
+elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
+    col_t, col_h = st.columns([4, 1])
+    with col_t:
+        st.header("⚙️ Gestione Ricettario e Area Riservata")
+    with col_h:
+        if st.button("🏠 Torna alla Home", use_container_width=True, key="btn_home_gestione"):
+            st.session_state.pagina_corrente = "🏠 Home"
+            st.rerun()
     
     if not st.session_state.autenticato:
-        st.warning("🔒 **Area Protetta**: Inserisci la password amministratore nella barra laterale sinistra per gestire le ricette.")
+        st.warning("🔒 Effettua prima l'accesso dalla Home.")
+        if st.button("Torna alla Home per accedere", use_container_width=True):
+            st.session_state.pagina_corrente = "🏠 Home"
+            st.rerun()
     else:
-        st.success("✅ Accesso amministrativo attivo.")
+        col_status, col_logout = st.columns([4, 1])
+        with col_status:
+            st.success("✅ Accesso amministrativo attivo.")
+        with col_logout:
+            if st.button("🚪 Logout", use_container_width=True):
+                st.session_state.autenticato = False
+                st.session_state.pagina_corrente = "🏠 Home"
+                st.rerun()
+                
         st.markdown("---")
         
         modo_gestione = st.radio("Seleziona operazione:", ["➕ Incolla / Inserisci Nuova Ricetta", "✏️ Modifica o Elimina Esistente"])
@@ -340,7 +450,8 @@ elif scelta_pagina == "⚙️ Area Gestione (Inserisci/Modifica)":
                 curiosita = st.text_area("Curiosità o Segreto dello Chef (opzionale)")
                 
                 fonte_url = st.text_input("Link del sito web di origine (opzionale)")
-                immagine_file = st.file_uploader("Carica la foto della ricetta", type=["jpg", "jpeg", "png", "webp"])
+                # Ora accetta qualsiasi estensione d'immagine inclusi .jfif, .webp, .png, .jpg
+                immagine_file = st.file_uploader("Carica la foto della ricetta", type=["jpg", "jpeg", "png", "webp", "jfif"])
                 
                 submit = st.form_submit_button("Salva Ricetta nel Database")
 
@@ -374,7 +485,7 @@ elif scelta_pagina == "⚙️ Area Gestione (Inserisci/Modifica)":
                     nuovi_ingredienti = st.text_area("Modifica Ingredienti", value=current_ing)
                     nuovo_procedimento = st.text_area("Modifica Procedimento", value=current_proc)
                     nuova_curiosita = st.text_area("Modifica Curiosità / Segreto", value=current_cur if current_cur else "")
-                    nuovo_url = st.text_input("Modifica Link Fonte", value=current_url if current_url else "")
+                    nuovo_url = st.text_input("Link Fonte", value=current_url if current_url else "")
                     
                     if current_img:
                         nome_file_img = os.path.basename(current_img)
@@ -382,7 +493,7 @@ elif scelta_pagina == "⚙️ Area Gestione (Inserisci/Modifica)":
                         if os.path.exists(full_img_path):
                             st.image(full_img_path, width=150)
                     
-                    nuova_immagine_file = st.file_uploader("Sostituisci foto (lascia vuoto per non cambiare)", type=["jpg", "jpeg", "png", "webp"])
+                    nuova_immagine_file = st.file_uploader("Sostituisci foto (lascia vuoto per non cambiare)", type=["jpg", "jpeg", "png", "webp", "jfif"])
                     rimuovi_img = st.checkbox("Elimina foto esistente")
 
                     col1, col2 = st.columns(2)
