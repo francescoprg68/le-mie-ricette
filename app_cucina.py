@@ -511,8 +511,9 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
                         elif nuova_immagine_file is not None:
                             img_path = save_uploaded_image(nuova_immagine_file)
 
+                        # CORRETTO: adesso usa correttamente 'nuova_categoria'
                         c.execute("UPDATE ricette SET titolo = ?, categoria = ?, ingredienti = ?, procedimento = ?, curiosita = ?, fonte_url = ?, immagine = ? WHERE id = ?", 
-                                  (nuovo_titolo, nueva_categoria if 'nuova_categoria' in locals() else nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
+                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
                         conn.commit()
                         conn.close()
                         st.success("Ricetta aggiornata con successo! Ricarica la pagina.")
