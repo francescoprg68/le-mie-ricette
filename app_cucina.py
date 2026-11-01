@@ -43,38 +43,34 @@ def save_uploaded_image(immagine_file):
             return ""
     return ""
 
-# --- CONFIGURAZIONE GRAFICA (CARATTERI PIÙ GRANDI E LEGGIBILI) ---
+# --- CONFIGURAZIONE GRAFICA (OTTIMIZZATA PER CELLULARE, TABLET E PC) ---
 def imposta_stile_grafico():
     stile_css = """
     <style>
-    /* Sfondo generale più caldo e meno accecante (Color Sabbia/Crema Accogliente) */
+    /* Sfondo generale del sito */
     .stApp {
         background-color: #F4F1EA !important;
     }
-    /* Nasconde completamente la barra laterale e il suo pulsante di apertura */
-    [data-testid="stSidebar"] {
+    /* Nasconde la barra laterale */
+    [data-testid="stSidebar"], [data-testid="collapsedControl"] {
         display: none;
     }
-    [data-testid="collapsedControl"] {
-        display: none;
-    }
-    /* Contenitore principale con un azzurrino pastello molto più soft e riposante */
+    /* Contenitore principale */
     div.block-container {
         background-color: #E6EEF8;
-        padding: 30px;
+        padding: 20px;
         border-radius: 20px;
         border: 2px solid #C8D8ED;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
-    /* Aumenta la dimensione generale del testo all'interno dell'app per una lettura comodissima */
+    /* Dimensione del testo leggibile ovunque */
     html, body, [class*="st-"] {
-        font-size: 1.12rem !important;
+        font-size: 1.1rem !important;
     }
-    /* Mostra SEMPRE la foto completa (senza tagli) */
+    /* Immagini sempre proporzionate e centrate */
     div[data-testid="stImage"] img {
-        max-height: 400px !important;
+        max-height: 350px !important;
         width: auto !important;
         max-width: 100% !important;
         object-fit: contain !important;
@@ -86,27 +82,39 @@ def imposta_stile_grafico():
         padding: 5px;
         border: 1px solid #C8D8ED;
     }
-    /* Titoli delle ricette negli expander belli grandi e in grassetto marcato */
-    .streamlit-expanderHeader p {
+    /* TITOLI DEGLI EXPANDER: forzati sempre scuri e in grassetto (anti-modalità scura mobile) */
+    .streamlit-expanderHeader p, 
+    .streamlit-expanderHeader span, 
+    div[data-testid="stExpander"] summary p, 
+    div[data-testid="stExpander"] summary span {
         font-weight: bold !important;
         font-size: 1.2rem !important;
         color: #1a365d !important;
-    }
-    /* Blocca qualsiasi effetto di trasparenza o sbiadimento al tocco/mouse */
-    div[data-testid="column"], div[data-testid="column"] *, div[data-testid="column"]:hover {
         opacity: 1 !important;
     }
+    /* Sfondo bianco pulito per gli expander delle ricette */
+    div[data-testid="stExpander"] {
+        background-color: #ffffff !important;
+        border-radius: 10px !important;
+        border: 1px solid #C8D8ED !important;
+        margin-bottom: 10px;
+    }
+    /* Testo e dettagli dentro gli expander ben visibili */
+    div[data-testid="stExpander"] div, 
+    div[data-testid="stExpander"] span, 
+    div[data-testid="stExpander"] p {
+        color: #2c3e50 !important;
+    }
+    /* Pulsanti sempre leggibili */
     .stButton button {
         opacity: 1 !important;
         background-color: #FFFFFF !important;
-        color: #333333 !important;
+        color: #1a365d !important;
         border: 1px solid #B0C6E2 !important;
         font-weight: bold;
-        font-size: 1.05rem !important;
         border-radius: 10px;
     }
     .stButton button:hover {
-        opacity: 1 !important;
         background-color: #D6E4FC !important;
         color: #b9770e !important;
         border-color: #b9770e !important;
@@ -511,7 +519,7 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
                         elif nuova_immagine_file is not None:
                             img_path = save_uploaded_image(nuova_immagine_file)
 
-                        # CORRETTO: adesso usa correttamente 'nuova_categoria'
+                        # CORRETTO: usa 'nuova_categoria' con la 'o'
                         c.execute("UPDATE ricette SET titolo = ?, categoria = ?, ingredienti = ?, procedimento = ?, curiosita = ?, fonte_url = ?, immagine = ? WHERE id = ?", 
                                   (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
                         conn.commit()
