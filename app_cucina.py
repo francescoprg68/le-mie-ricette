@@ -43,81 +43,97 @@ def save_uploaded_image(immagine_file):
             return ""
     return ""
 
-# --- CONFIGURAZIONE GRAFICA (OTTIMIZZATA PER CELLULARE, TABLET E PC) ---
+# --- CONFIGURAZIONE GRAFICA VIVACE E ACCESSIVILE ---
 def imposta_stile_grafico():
     stile_css = """
     <style>
-    /* Sfondo generale del sito */
+    /* Sfondo generale stile carta da ricettario (Crema/Sabbia) */
     .stApp {
-        background-color: #F4F1EA !important;
+        background-color: #F7F4EF !important;
     }
-    /* Nasconde la barra laterale */
+    
+    /* Nasconde la barra laterale di Streamlit */
     [data-testid="stSidebar"], [data-testid="collapsedControl"] {
         display: none;
     }
-    /* Contenitore principale */
+    
+    /* Contenitore principale ben rifinito */
     div.block-container {
-        background-color: #E6EEF8;
-        padding: 20px;
-        border-radius: 20px;
-        border: 2px solid #C8D8ED;
+        background-color: #FFFFFF;
+        padding: 25px;
+        border-radius: 24px;
+        border: 2px solid #E2D7C5;
         margin-top: 15px;
-        margin-bottom: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     }
-    /* Dimensione del testo leggibile ovunque */
+    
+    /* Dimensione testo base */
     html, body, [class*="st-"] {
         font-size: 1.1rem !important;
+        color: #2D3748 !important;
     }
-    /* Immagini sempre proporzionate e centrate */
-    div[data-testid="stImage"] img {
-        max-height: 350px !important;
-        width: auto !important;
-        max-width: 100% !important;
-        object-fit: contain !important;
-        border-radius: 12px !important;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        background-color: #F0F5FC;
-        padding: 5px;
-        border: 1px solid #C8D8ED;
+
+    /* Stile personalizzato per gli expander (schede ricette) */
+    div[data-testid="stExpander"] {
+        background-color: #FDFBF7 !important;
+        border-radius: 14px !important;
+        border: 1px solid #E2D7C5 !important;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
-    /* TITOLI DEGLI EXPANDER: forzati sempre scuri e in grassetto (anti-modalità scura mobile) */
+
+    /* TITOLI FISSI E SCURI (Anti Modalità Scura dei cellulari) */
     .streamlit-expanderHeader p, 
     .streamlit-expanderHeader span, 
     div[data-testid="stExpander"] summary p, 
     div[data-testid="stExpander"] summary span {
         font-weight: bold !important;
-        font-size: 1.2rem !important;
-        color: #1a365d !important;
+        font-size: 1.25rem !important;
+        color: #1A202C !important;
         opacity: 1 !important;
     }
-    /* Sfondo bianco pulito per gli expander delle ricette */
-    div[data-testid="stExpander"] {
-        background-color: #ffffff !important;
-        border-radius: 10px !important;
-        border: 1px solid #C8D8ED !important;
-        margin-bottom: 10px;
+
+    /* Testo interno alle ricette */
+    div[data-testid="stExpander"] p, 
+    div[data-testid="stExpander"] li, 
+    div[data-testid="stExpander"] div {
+        color: #2D3748 !important;
+        line-height: 1.6;
     }
-    /* Testo e dettagli dentro gli expander ben visibili */
-    div[data-testid="stExpander"] div, 
-    div[data-testid="stExpander"] span, 
-    div[data-testid="stExpander"] p {
-        color: #2c3e50 !important;
+
+    /* Immagini ricette ben centrate e incorniciate */
+    div[data-testid="stImage"] img {
+        max-height: 380px !important;
+        width: auto !important;
+        max-width: 100% !important;
+        object-fit: contain !important;
+        border-radius: 14px !important;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #FFF;
+        padding: 6px;
+        border: 1px solid #E2D7C5;
     }
-    /* Pulsanti sempre leggibili */
+
+    /* Pulsanti con colori caldi ed effetto al passaggio del mouse */
     .stButton button {
         opacity: 1 !important;
-        background-color: #FFFFFF !important;
-        color: #1a365d !important;
-        border: 1px solid #B0C6E2 !important;
-        font-weight: bold;
-        border-radius: 10px;
+        background-color: #FFFDF9 !important;
+        color: #2D3748 !important;
+        border: 2px solid #CBD5E0 !important;
+        font-weight: bold !important;
+        border-radius: 12px !important;
+        padding: 8px 16px !important;
+        transition: all 0.2s ease-in-out;
     }
+    
     .stButton button:hover {
-        background-color: #D6E4FC !important;
-        color: #b9770e !important;
-        border-color: #b9770e !important;
+        background-color: #DD6B20 !important;
+        color: #FFFFFF !important;
+        border-color: #DD6B20 !important;
+        transform: translateY(-1px);
     }
     </style>
     """
