@@ -43,13 +43,13 @@ def save_uploaded_image(immagine_file):
             return ""
     return ""
 
-# --- CONFIGURAZIONE GRAFICA VIVACE E ACCESSIVILE ---
+# --- CONFIGURAZIONE GRAFICA CALDA E ACCOGLIENTE (EFFETTO RICETTARIO) ---
 def imposta_stile_grafico():
     stile_css = """
     <style>
-    /* Sfondo generale stile carta da ricettario (Crema/Sabbia) */
+    /* Sfondo generale del sito color carta pergamena/sabbia calda */
     .stApp {
-        background-color: #F7F4EF !important;
+        background-color: #F4EEDC !important;
     }
     
     /* Nasconde la barra laterale di Streamlit */
@@ -57,30 +57,30 @@ def imposta_stile_grafico():
         display: none;
     }
     
-    /* Contenitore principale ben rifinito */
+    /* Contenitore principale con sfondo crema caldo e bordo sfumato */
     div.block-container {
-        background-color: #FFFFFF;
-        padding: 25px;
+        background-color: #FAF6ED;
+        padding: 30px;
         border-radius: 24px;
-        border: 2px solid #E2D7C5;
+        border: 3px solid #D9C5A0;
         margin-top: 15px;
         margin-bottom: 25px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 25px rgba(140, 74, 25, 0.1);
     }
     
-    /* Dimensione testo base */
+    /* Dimensione testo base leggibile */
     html, body, [class*="st-"] {
         font-size: 1.1rem !important;
-        color: #2D3748 !important;
+        color: #2C3E50 !important;
     }
 
-    /* Stile personalizzato per gli expander (schede ricette) */
+    /* Sfondo colorato e caldo per i box delle ricette (Expander) */
     div[data-testid="stExpander"] {
-        background-color: #FDFBF7 !important;
+        background-color: #FFFDF9 !important;
         border-radius: 14px !important;
-        border: 1px solid #E2D7C5 !important;
-        margin-bottom: 12px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        border: 2px solid #D9C5A0 !important;
+        margin-bottom: 14px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.03);
     }
 
     /* TITOLI FISSI E SCURI (Anti Modalità Scura dei cellulari) */
@@ -89,8 +89,8 @@ def imposta_stile_grafico():
     div[data-testid="stExpander"] summary p, 
     div[data-testid="stExpander"] summary span {
         font-weight: bold !important;
-        font-size: 1.25rem !important;
-        color: #1A202C !important;
+        font-size: 1.15rem !important;
+        color: #8C4A19 !important;
         opacity: 1 !important;
     }
 
@@ -98,11 +98,11 @@ def imposta_stile_grafico():
     div[data-testid="stExpander"] p, 
     div[data-testid="stExpander"] li, 
     div[data-testid="stExpander"] div {
-        color: #2D3748 !important;
+        color: #2C3E50 !important;
         line-height: 1.6;
     }
 
-    /* Immagini ricette ben centrate e incorniciate */
+    /* Immagini ricette ben centrate con cornice coordinata */
     div[data-testid="stImage"] img {
         max-height: 380px !important;
         width: auto !important;
@@ -112,34 +112,38 @@ def imposta_stile_grafico():
         display: block;
         margin-left: auto;
         margin-right: auto;
-        background-color: #FFF;
+        background-color: #FFFDF9;
         padding: 6px;
-        border: 1px solid #E2D7C5;
+        border: 2px solid #D9C5A0;
     }
 
-    /* Pulsanti con colori caldi ed effetto al passaggio del mouse */
+    /* Pulsanti caldi color terracotta chiaro con effetto al passaggio del mouse */
     .stButton button {
         opacity: 1 !important;
-        background-color: #FFFDF9 !important;
-        color: #2D3748 !important;
-        border: 2px solid #CBD5E0 !important;
+        background-color: #F3E5D8 !important;
+        color: #8C4A19 !important;
+        border: 2px solid #C89F73 !important;
         font-weight: bold !important;
         border-radius: 12px !important;
-        padding: 8px 16px !important;
+        padding: 8px 18px !important;
         transition: all 0.2s ease-in-out;
     }
     
     .stButton button:hover {
-        background-color: #DD6B20 !important;
+        background-color: #C05621 !important;
         color: #FFFFFF !important;
-        border-color: #DD6B20 !important;
-        transform: translateY(-1px);
+        border-color: #C05621 !important;
+        transform: translateY(-2px);
     }
     </style>
     """
     st.markdown(stile_css, unsafe_allow_html=True)
 
 imposta_stile_grafico()
+
+# Intitolazione pulita e unica della pagina principale
+st.markdown("<h1 style='text-align: center; color: #8C4A19;'>🍳 Il Mio Ricettario di Casa 📖</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #5C6B73; font-style: italic; margin-bottom: 30px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
 
 # --- INIZIALIZZAZIONE DATABASE SQLITE ---
 def get_connection():
@@ -151,13 +155,13 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS ricette 
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                  titolo TEXT, 
-                  categoria TEXT, 
-                  ingredienti TEXT, 
-                  procedimento TEXT, 
-                  curiosita TEXT,
-                  fonte_url TEXT, 
-                  immagine TEXT)''')
+                 titolo TEXT, 
+                 categoria TEXT, 
+                 ingredienti TEXT, 
+                 procedimento TEXT, 
+                 curiosita TEXT,
+                 fonte_url TEXT, 
+                 immagine TEXT)''')
     
     c.execute("PRAGMA table_info(ricette)")
     columns = [column[1] for column in c.fetchall()]
@@ -179,7 +183,7 @@ if "autenticato" not in st.session_state:
 if "mostra_login_inline" not in st.session_state:
     st.session_state.mostra_login_inline = False
 
-# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE A TUTTO SCHERMO ---
+# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE CON GRIGLIA A 2 COLONNE ---
 def mostra_categoria(nome_categoria):
     col_titolo, col_home = st.columns([4, 1])
     with col_titolo:
@@ -198,30 +202,59 @@ def mostra_categoria(nome_categoria):
 
     if ricette:
         titles = [r[1] for r in ricette]
-        scelta_ricetta = st.selectbox(f"Scegli una ricetta in {nome_categoria}:", ["Visualizza Tutti"] + titles, key=f"sb_main_{nome_categoria}")
+        scelta_ricetta = st.selectbox(f"Scegli una ricetta specifica in {nome_categoria}:", ["Visualizza Tutti"] + titles, key=f"sb_main_{nome_categoria}")
         
         st.markdown("<br>", unsafe_allow_html=True)
 
         if scelta_ricetta == "Visualizza Tutti":
-            for item_id, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path in ricette:
-                with st.expander(titolo):
-                    if img_path:
-                        nome_file_img = os.path.basename(img_path)
-                        full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
-                        if os.path.exists(full_img_path):
-                            st.image(full_img_path, use_container_width=True)
-                    
-                    st.markdown("### 🛒 Ingredienti")
-                    st.text(ingredienti)
-                    
-                    st.markdown("### 👩‍🍳 Procedimento")
-                    st.text(procedimento)
-                    
-                    if curiosita:
-                        st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita}")
-                    
-                    if fonte_url:
-                        st.markdown(f"🔗 **Fonte originale:** [{fonte_url}]({fonte_url})")
+            # Ciclo a blocchi di 2 che gestisce perfettamente sia numeri pari che dispari di ricette
+            for i in range(0, len(ricette), 2):
+                col_a, col_b = st.columns(2)
+                
+                # Prima ricetta (colonna sinistra)
+                item_id_a, titolo_a, ingredienti_a, procedimento_a, curiosita_a, fonte_url_a, img_path_a = ricette[i]
+                with col_a:
+                    with st.expander(f"{titolo_a}", key=f"exp_{item_id_a}"):
+                        if img_path_a:
+                            nome_file_a = os.path.basename(img_path_a)
+                            full_path_a = os.path.join(MEDIA_DIR, nome_file_a)
+                            if os.path.exists(full_path_a):
+                                st.image(full_path_a, use_container_width=True)
+                        
+                        st.markdown("### 🛒 Ingredienti")
+                        st.text(ingredienti_a)
+                        
+                        st.markdown("### 👩‍🍳 Procedimento")
+                        st.text(procedimento_a)
+                        
+                        if curiosita_a:
+                            st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita_a}")
+                        
+                        if fonte_url_a:
+                            st.markdown(f"🔗 **Fonte originale:** [{fonte_url_a}]({fonte_url_a})")
+                
+                # Seconda ricetta (colonna destra - se esiste un elemento successivo)
+                if i + 1 < len(ricette):
+                    item_id_b, titolo_b, ingredienti_b, procedimento_b, curiosita_b, fonte_url_b, img_path_b = ricette[i + 1]
+                    with col_b:
+                        with st.expander(f"{titolo_b}", key=f"exp_{item_id_b}"):
+                            if img_path_b:
+                                nome_file_b = os.path.basename(img_path_b)
+                                full_path_b = os.path.join(MEDIA_DIR, nome_file_b)
+                                if os.path.exists(full_path_b):
+                                    st.image(full_path_b, use_container_width=True)
+                            
+                            st.markdown("### 🛒 Ingredienti")
+                            st.text(ingredienti_b)
+                            
+                            st.markdown("### 👩‍🍳 Procedimento")
+                            st.text(procedimento_b)
+                            
+                            if curiosita_b:
+                                st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita_b}")
+                            
+                            if fonte_url_b:
+                                st.markdown(f"🔗 **Fonte originale:** [{fonte_url_b}]({fonte_url_b})")
         else:
             for item_id, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path in ricette:
                 if titolo == scelta_ricetta:
@@ -259,16 +292,6 @@ def mostra_categoria(nome_categoria):
 
 # --- GESTIONE PAGINE PRINCIPALI ---
 if st.session_state.pagina_corrente == "🏠 Home":
-    st.markdown(
-        """
-        <div style="background-color: #E6EEF8; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #C8D8ED; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-            <h1 style="color: #b9770e; font-family: sans-serif; margin-bottom: 5px;">🍳 Il Mio Ricettario Personale</h1>
-            <p style="font-size: 1.2rem; color: #555; font-style: italic; margin: 0;">"Il segreto della cucina è l'amore... e un buon archivio portatile!"</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
     # --- TASTO / BOX ACCESSO GESTIONE NELLA HOME ---
     col_h1, col_h2, col_h3 = st.columns([1, 2, 1])
     with col_h2:
@@ -318,30 +341,25 @@ if st.session_state.pagina_corrente == "🏠 Home":
     conn = get_connection()
     c = conn.cursor()
 
-    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Antipasti' ORDER BY id DESC LIMIT 1")
+    c.execute("SELECT COUNT(*) FROM ricette WHERE categoria = 'Antipasti'")
     res_ant = c.fetchone()
     num_ant = res_ant[0] if res_ant else 0
-    ultima_ant = res_ant[1] if res_ant and res_ant[1] else "Nessuna"
 
-    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Primi' ORDER BY id DESC LIMIT 1")
+    c.execute("SELECT COUNT(*) FROM ricette WHERE categoria = 'Primi'")
     res_pri = c.fetchone()
     num_pri = res_pri[0] if res_pri else 0
-    ultima_pri = res_pri[1] if res_pri and res_pri[1] else "Nessuna"
 
-    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Secondi' ORDER BY id DESC LIMIT 1")
+    c.execute("SELECT COUNT(*) FROM ricette WHERE categoria = 'Secondi'")
     res_sec = c.fetchone()
     num_sec = res_sec[0] if res_sec else 0
-    ultima_sec = res_sec[1] if res_sec and res_sec[1] else "Nessuna"
 
-    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Dolci' ORDER BY id DESC LIMIT 1")
+    c.execute("SELECT COUNT(*) FROM ricette WHERE categoria = 'Dolci'")
     res_dol = c.fetchone()
     num_dol = res_dol[0] if res_dol else 0
-    ultima_dol = res_dol[1] if res_dol and res_dol[1] else "Nessuna"
 
-    c.execute("SELECT COUNT(*), titolo FROM ricette WHERE categoria = 'Altro' ORDER BY id DESC LIMIT 1")
+    c.execute("SELECT COUNT(*) FROM ricette WHERE categoria = 'Altro'")
     res_alt = c.fetchone()
     num_alt = res_alt[0] if res_alt else 0
-    ultima_alt = res_alt[1] if res_alt and res_alt[1] else "Nessuna"
 
     conn.close()
 
@@ -350,10 +368,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col1:
         st.markdown(
             f"""
-            <div style="border: 2px solid #d4edda; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
                 <h4 style="margin:0; color: #222; font-size: 1.15rem;">🥗 Antipasti</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #28a745; margin: 6px 0;">{num_ant} inseriti</p>
-                <p style="font-size: 0.85rem; color: #666;">Ultima:<br><b>{ultima_ant}</b></p>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #28a745; margin: 12px 0 0 0;">{num_ant} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -365,10 +382,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col2:
         st.markdown(
             f"""
-            <div style="border: 2px solid #d1ecf1; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
                 <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍝 Primi</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #17a2b8; margin: 6px 0;">{num_pri} inseriti</p>
-                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_pri}</b></p>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #17a2b8; margin: 12px 0 0 0;">{num_pri} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -380,10 +396,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col3:
         st.markdown(
             f"""
-            <div style="border: 2px solid #f8d7da; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
                 <h4 style="margin:0; color: #222; font-size: 1.15rem;">🥩 Secondi</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #dc3545; margin: 6px 0;">{num_sec} inseriti</p>
-                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_sec}</b></p>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #dc3545; margin: 12px 0 0 0;">{num_sec} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -395,10 +410,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col4:
         st.markdown(
             f"""
-            <div style="border: 2px solid #fff3cd; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
                 <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍰 Dolci</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #ffc107; margin: 6px 0;">{num_dol} inseriti</p>
-                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_dol}</b></p>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #d69e2e; margin: 12px 0 0 0;">{num_dol} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -410,10 +424,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col5:
         st.markdown(
             f"""
-            <div style="border: 2px solid #e2d9f3; background-color: #E6EEF8; padding: 15px; border-radius: 12px; text-align: center; height: 170px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
                 <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍹 Altro</h4>
-                <p style="font-size: 1.2rem; font-weight: bold; color: #6f42c1; margin: 6px 0;">{num_alt} inseriti</p>
-                <p style="font-size: 0.85rem; color: #666;">Ultimo:<br><b>{ultima_alt}</b></p>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #6f42c1; margin: 12px 0 0 0;">{num_alt} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -501,9 +514,9 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
             conn.close()
 
             if elementi:
-                mapping = {elem[1]: elem for elem in elementi}
-                scelta_titolo = st.selectbox("Scegli quale ricetta modificare:", list(mapping.keys()))
-                item_id, current_title, current_cat, current_ing, current_proc, current_cur, current_url, current_img = mapping[scelta_titolo]
+                mapping = {f"[ID: {elem[0]}] {elem[1]}": elem for elem in elementi}
+                scelta_etichetta = st.selectbox("Scegli quale ricetta modificare o eliminare:", list(mapping.keys()))
+                item_id, current_title, current_cat, current_ing, current_proc, current_cur, current_url, current_img = mapping[scelta_etichetta]
 
                 with st.form("form_modifica_ricetta"):
                     nuovo_titolo = st.text_input("Modifica Titolo", value=current_title)
@@ -535,9 +548,8 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
                         elif nuova_immagine_file is not None:
                             img_path = save_uploaded_image(nuova_immagine_file)
 
-                        # CORRETTO: usa 'nuova_categoria' con la 'o'
                         c.execute("UPDATE ricette SET titolo = ?, categoria = ?, ingredienti = ?, procedimento = ?, curiosita = ?, fonte_url = ?, immagine = ? WHERE id = ?", 
-                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
+                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nueva_curiosita if 'nueva_curiosita' in locals() else nuova_curiosita, nuovo_url, img_path, item_id))
                         conn.commit()
                         conn.close()
                         st.success("Ricetta aggiornata con successo! Ricarica la pagina.")
