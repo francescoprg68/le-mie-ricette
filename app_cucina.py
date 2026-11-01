@@ -43,13 +43,15 @@ def save_uploaded_image(immagine_file):
             return ""
     return ""
 
-# --- CONFIGURAZIONE GRAFICA CALDA E ACCOGLIENTE (EFFETTO RICETTARIO) ---
+# --- CONFIGURAZIONE GRAFICA RICETTARIO ARTIGIANALE E CALDO ---
 def imposta_stile_grafico():
     stile_css = """
     <style>
-    /* Sfondo generale del sito color carta pergamena/sabbia calda */
+    /* Sfondo generale stile carta da cucina retrò */
     .stApp {
-        background-color: #F4EEDC !important;
+        background-color: #F7F1E3 !important;
+        background-image: radial-gradient(#E8DFC9 0.75px, transparent 0.75px);
+        background-size: 15px 15px;
     }
     
     /* Nasconde la barra laterale di Streamlit */
@@ -57,83 +59,65 @@ def imposta_stile_grafico():
         display: none;
     }
     
-    /* Contenitore principale con sfondo crema caldo e bordo sfumato */
+    /* Contenitore principale stile quaderno di ricette */
     div.block-container {
-        background-color: #FAF6ED;
-        padding: 30px;
-        border-radius: 24px;
-        border: 3px solid #D9C5A0;
-        margin-top: 15px;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 25px rgba(140, 74, 25, 0.1);
+        background-color: #FFFCF6;
+        padding: 35px;
+        border-radius: 20px;
+        border: 2px solid #D2B48C;
+        margin-top: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 12px 30px rgba(139, 69, 19, 0.08);
     }
     
+    /* Tipografia calda ed elegante per titoli */
+    h1, h2, h3, h4 {
+        font-family: 'Georgia', serif !important;
+        color: #7A3B12 !important;
+    }
+
     /* Dimensione testo base leggibile */
     html, body, [class*="st-"] {
         font-size: 1.1rem !important;
-        color: #2C3E50 !important;
+        color: #3B2F2F !important;
     }
 
-    /* Sfondo colorato e caldo per i box delle ricette (Expander) */
-    div[data-testid="stExpander"] {
-        background-color: #FFFDF9 !important;
-        border-radius: 14px !important;
-        border: 2px solid #D9C5A0 !important;
-        margin-bottom: 14px;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.03);
-    }
-
-    /* TITOLI FISSI E SCURI (Anti Modalità Scura dei cellulari) */
-    .streamlit-expanderHeader p, 
-    .streamlit-expanderHeader span, 
-    div[data-testid="stExpander"] summary p, 
-    div[data-testid="stExpander"] summary span {
-        font-weight: bold !important;
-        font-size: 1.15rem !important;
-        color: #8C4A19 !important;
-        opacity: 1 !important;
-    }
-
-    /* Testo interno alle ricette */
-    div[data-testid="stExpander"] p, 
-    div[data-testid="stExpander"] li, 
-    div[data-testid="stExpander"] div {
-        color: #2C3E50 !important;
-        line-height: 1.6;
-    }
-
-    /* Immagini ricette ben centrate con cornice coordinata */
+    /* Immagini ricette con cornice stile polaroid/ricetta */
     div[data-testid="stImage"] img {
-        max-height: 380px !important;
+        max-height: 400px !important;
         width: auto !important;
         max-width: 100% !important;
         object-fit: contain !important;
-        border-radius: 14px !important;
+        border-radius: 12px !important;
         display: block;
         margin-left: auto;
         margin-right: auto;
         background-color: #FFFDF9;
-        padding: 6px;
-        border: 2px solid #D9C5A0;
+        padding: 8px;
+        border: 2px solid #D2B48C;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    /* Pulsanti caldi color terracotta chiaro con effetto al passaggio del mouse */
+    /* Pulsanti caldi color terracotta artigianale */
     .stButton button {
         opacity: 1 !important;
-        background-color: #F3E5D8 !important;
-        color: #8C4A19 !important;
-        border: 2px solid #C89F73 !important;
+        background-color: #F4E8D8 !important;
+        color: #7A3B12 !important;
+        border: 2px solid #C49A6C !important;
         font-weight: bold !important;
         border-radius: 12px !important;
-        padding: 8px 18px !important;
+        padding: 10px 20px !important;
         transition: all 0.2s ease-in-out;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        width: 100%;
     }
     
     .stButton button:hover {
-        background-color: #C05621 !important;
+        background-color: #A0522D !important;
         color: #FFFFFF !important;
-        border-color: #C05621 !important;
+        border-color: #A0522D !important;
         transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(160, 82, 45, 0.2);
     }
     </style>
     """
@@ -141,9 +125,9 @@ def imposta_stile_grafico():
 
 imposta_stile_grafico()
 
-# Intitolazione pulita e unica della pagina principale
-st.markdown("<h1 style='text-align: center; color: #8C4A19;'>🍳 Il Mio Ricettario di Casa 📖</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #5C6B73; font-style: italic; margin-bottom: 30px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
+# Intitolazione con stile ricettario antico
+st.markdown("<h1 style='text-align: center; color: #7A3B12; font-family: Georgia, serif;'>🍳 Il Mio Ricettario di Casa 📖</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #6E5B4D; font-style: italic; font-size: 1.15rem; margin-bottom: 35px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
 
 # --- INIZIALIZZAZIONE DATABASE SQLITE ---
 def get_connection():
@@ -183,7 +167,11 @@ if "autenticato" not in st.session_state:
 if "mostra_login_inline" not in st.session_state:
     st.session_state.mostra_login_inline = False
 
-# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE CON GRIGLIA A 2 COLONNE ---
+# --- GESTIONE VISUALIZZAZIONE SINGOLA RICETTA SELEZIONATA ---
+if "ricetta_selezionata" not in st.session_state:
+    st.session_state.ricetta_selezionata = None
+
+# --- FUNZIONE GENERICA PER MOSTRARE LE CATEGORIE CON PULSANTI A GRIGLIA PULITI ---
 def mostra_categoria(nome_categoria):
     col_titolo, col_home = st.columns([4, 1])
     with col_titolo:
@@ -191,6 +179,7 @@ def mostra_categoria(nome_categoria):
     with col_home:
         if st.button("🏠 Torna alla Home", key=f"btn_home_top_{nome_categoria}", use_container_width=True):
             st.session_state.pagina_corrente = "🏠 Home"
+            st.session_state.ricetta_selezionata = None
             st.session_state.mostra_login_inline = False
             st.rerun()
 
@@ -201,85 +190,69 @@ def mostra_categoria(nome_categoria):
     conn.close()
 
     if ricette:
-        titles = [r[1] for r in ricette]
-        scelta_ricetta = st.selectbox(f"Scegli una ricetta specifica in {nome_categoria}:", ["Visualizza Tutti"] + titles, key=f"sb_main_{nome_categoria}")
-        
+        if st.session_state.ricetta_selezionata is not None:
+            r_selezionata = next((r for r in ricette if r[0] == st.session_state.ricetta_selezionata), None)
+            if r_selezionata:
+                _, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path = r_selezionata
+                
+                if st.button("⬅️ Torna alla lista ricette", key="btn_torna_lista"):
+                    st.session_state.ricetta_selezionata = None
+                    st.rerun()
+                
+                # TITOLO DELLA RICETTA IN UN ELEGANTE CARTONCINO IN EVIDENZA
+                st.markdown(f"""
+                    <div style="background-color: #FFFDF9; padding: 25px; border-radius: 16px; border: 2px solid #D2B48C; text-align: center; margin: 25px 0; box-shadow: 0 4px 12px rgba(139,69,19,0.06);">
+                        <span style="font-family: Georgia, serif; color: #7A3B12; font-size: 3.2rem; font-weight: bold; letter-spacing: 1px; display: block;">{titolo}</span>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                if img_path:
+                    nome_file_img = os.path.basename(img_path)
+                    full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
+                    if os.path.exists(full_img_path):
+                        st.image(full_img_path, use_container_width=True)
+                
+                st.markdown("### 🛒 Ingredienti")
+                st.text(ingredienti)
+                
+                st.markdown("### 👩‍🍳 Procedimento")
+                st.text(procedimento)
+                
+                if curiosita:
+                    st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita}")
+                
+                if fonte_url:
+                    st.markdown(f"🔗 **Fonte originale:** [{fonte_url}]({fonte_url})")
+                
+                st.markdown("---")
+                if st.button("⬅️ Torna alla lista ricette", key="btn_torna_lista_bottom"):
+                    st.session_state.ricetta_selezionata = None
+                    st.rerun()
+                return
+
+        st.markdown("<p style='color: #6E5B4D; font-style: italic;'>Clicca su una ricetta per leggerla:</p>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
 
-        if scelta_ricetta == "Visualizza Tutti":
-            # Ciclo a blocchi di 2 che gestisce perfettamente sia numeri pari che dispari di ricette
-            for i in range(0, len(ricette), 2):
-                col_a, col_b = st.columns(2)
-                
-                # Prima ricetta (colonna sinistra)
-                item_id_a, titolo_a, ingredienti_a, procedimento_a, curiosita_a, fonte_url_a, img_path_a = ricette[i]
-                with col_a:
-                    with st.expander(f"{titolo_a}", key=f"exp_{item_id_a}"):
-                        if img_path_a:
-                            nome_file_a = os.path.basename(img_path_a)
-                            full_path_a = os.path.join(MEDIA_DIR, nome_file_a)
-                            if os.path.exists(full_path_a):
-                                st.image(full_path_a, use_container_width=True)
-                        
-                        st.markdown("### 🛒 Ingredienti")
-                        st.text(ingredienti_a)
-                        
-                        st.markdown("### 👩‍🍳 Procedimento")
-                        st.text(procedimento_a)
-                        
-                        if curiosita_a:
-                            st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita_a}")
-                        
-                        if fonte_url_a:
-                            st.markdown(f"🔗 **Fonte originale:** [{fonte_url_a}]({fonte_url_a})")
-                
-                # Seconda ricetta (colonna destra - se esiste un elemento successivo)
-                if i + 1 < len(ricette):
-                    item_id_b, titolo_b, ingredienti_b, procedimento_b, curiosita_b, fonte_url_b, img_path_b = ricette[i + 1]
-                    with col_b:
-                        with st.expander(f"{titolo_b}", key=f"exp_{item_id_b}"):
-                            if img_path_b:
-                                nome_file_b = os.path.basename(img_path_b)
-                                full_path_b = os.path.join(MEDIA_DIR, nome_file_b)
-                                if os.path.exists(full_path_b):
-                                    st.image(full_path_b, use_container_width=True)
-                            
-                            st.markdown("### 🛒 Ingredienti")
-                            st.text(ingredienti_b)
-                            
-                            st.markdown("### 👩‍🍳 Procedimento")
-                            st.text(procedimento_b)
-                            
-                            if curiosita_b:
-                                st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita_b}")
-                            
-                            if fonte_url_b:
-                                st.markdown(f"🔗 **Fonte originale:** [{fonte_url_b}]({fonte_url_b})")
-        else:
-            for item_id, titolo, ingredienti, procedimento, curiosita, fonte_url, img_path in ricette:
-                if titolo == scelta_ricetta:
-                    st.subheader(titolo)
-                    if img_path:
-                        nome_file_img = os.path.basename(img_path)
-                        full_img_path = os.path.join(MEDIA_DIR, nome_file_img)
-                        if os.path.exists(full_img_path):
-                            st.image(full_img_path, use_container_width=True)
-                    
-                    st.markdown("### 🛒 Ingredienti")
-                    st.text(ingredienti)
-                    
-                    st.markdown("### 👩‍🍳 Procedimento")
-                    st.text(procedimento)
-                    
-                    if curiosita:
-                        st.markdown(f"💡 **Curiosità / Segreto dello Chef:**\n> {curiosita}")
-                    
-                    if fonte_url:
-                        st.markdown(f"🔗 **Fonte originale:** [{fonte_url}]({fonte_url})")
+        for i in range(0, len(ricette), 2):
+            col_a, col_b = st.columns(2)
+            
+            item_id_a, titolo_a, _, _, _, _, _ = ricette[i]
+            with col_a:
+                if st.button(f"📖 {titolo_a}", key=f"btn_ricetta_{item_id_a}", use_container_width=True):
+                    st.session_state.ricetta_selezionata = item_id_a
+                    st.rerun()
+            
+            if i + 1 < len(ricette):
+                item_id_b, titolo_b, _, _, _, _, _ = ricette[i + 1]
+                with col_b:
+                    if st.button(f"📖 {titolo_b}", key=f"btn_ricetta_{item_id_b}", use_container_width=True):
+                        st.session_state.ricetta_selezionata = item_id_b
+                        st.rerun()
 
         st.markdown("---")
         if st.button("🏠 Torna alla Home", key=f"btn_home_bottom_{nome_categoria}", use_container_width=True):
             st.session_state.pagina_corrente = "🏠 Home"
+            st.session_state.ricetta_selezionata = None
             st.session_state.mostra_login_inline = False
             st.rerun()
 
@@ -287,12 +260,14 @@ def mostra_categoria(nome_categoria):
         st.info(f"Nessuna ricetta inserita in '{nome_categoria}' al momento.")
         if st.button("🏠 Torna alla Home", key=f"btn_home_empty_{nome_categoria}", use_container_width=True):
             st.session_state.pagina_corrente = "🏠 Home"
+            st.session_state.ricetta_selezionata = None
             st.session_state.mostra_login_inline = False
             st.rerun()
 
 # --- GESTIONE PAGINE PRINCIPALI ---
 if st.session_state.pagina_corrente == "🏠 Home":
-    # --- TASTO / BOX ACCESSO GESTIONE NELLA HOME ---
+    st.session_state.ricetta_selezionata = None
+    
     col_h1, col_h2, col_h3 = st.columns([1, 2, 1])
     with col_h2:
         if not st.session_state.autenticato:
@@ -321,8 +296,8 @@ if st.session_state.pagina_corrente == "🏠 Home":
         else:
             st.markdown(
                 """
-                <div style="background-color: rgba(230, 248, 230, 0.98); padding: 15px; border-radius: 10px; border: 1px solid #28a745; text-align: center; margin-bottom: 10px;">
-                    <h4 style="margin:0; color: #28a745;">✅ Area Amministrativa Attiva</h4>
+                <div style="background-color: rgba(230, 248, 230, 0.98); padding: 15px; border-radius: 12px; border: 1px solid #28a745; text-align: center; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                    <h4 style="margin:0; color: #28a745; font-family: Georgia, serif;">✅ Area Amministrativa Attiva</h4>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -368,9 +343,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col1:
         st.markdown(
             f"""
-            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🥗 Antipasti</h4>
-                <p style="font-size: 1.3rem; font-weight: bold; color: #28a745; margin: 12px 0 0 0;">{num_ant} inseriti</p>
+            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
+                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🥗 Antipasti</h4>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #2e7d32; margin: 14px 0 0 0;">{num_ant} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -382,9 +357,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col2:
         st.markdown(
             f"""
-            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍝 Primi</h4>
-                <p style="font-size: 1.3rem; font-weight: bold; color: #17a2b8; margin: 12px 0 0 0;">{num_pri} inseriti</p>
+            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
+                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🍝 Primi</h4>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #00838f; margin: 14px 0 0 0;">{num_pri} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -396,9 +371,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col3:
         st.markdown(
             f"""
-            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🥩 Secondi</h4>
-                <p style="font-size: 1.3rem; font-weight: bold; color: #dc3545; margin: 12px 0 0 0;">{num_sec} inseriti</p>
+            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
+                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🥩 Secondi</h4>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #c62828; margin: 14px 0 0 0;">{num_sec} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -410,9 +385,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col4:
         st.markdown(
             f"""
-            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍰 Dolci</h4>
-                <p style="font-size: 1.3rem; font-weight: bold; color: #d69e2e; margin: 12px 0 0 0;">{num_dol} inseriti</p>
+            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
+                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🍰 Dolci</h4>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #f57f17; margin: 14px 0 0 0;">{num_dol} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -424,9 +399,9 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col5:
         st.markdown(
             f"""
-            <div style="border: 2px solid #C89F73; background-color: #FFFDF9; padding: 20px; border-radius: 12px; text-align: center; height: 130px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                <h4 style="margin:0; color: #222; font-size: 1.15rem;">🍹 Altro</h4>
-                <p style="font-size: 1.3rem; font-weight: bold; color: #6f42c1; margin: 12px 0 0 0;">{num_alt} inseriti</p>
+            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
+                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🍹 Altro</h4>
+                <p style="font-size: 1.3rem; font-weight: bold; color: #6a1b9a; margin: 14px 0 0 0;">{num_alt} inseriti</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -549,7 +524,7 @@ elif st.session_state.pagina_corrente == "⚙️ Gestione Ricette":
                             img_path = save_uploaded_image(nuova_immagine_file)
 
                         c.execute("UPDATE ricette SET titolo = ?, categoria = ?, ingredienti = ?, procedimento = ?, curiosita = ?, fonte_url = ?, immagine = ? WHERE id = ?", 
-                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nueva_curiosita if 'nueva_curiosita' in locals() else nuova_curiosita, nuovo_url, img_path, item_id))
+                                  (nuovo_titolo, nuova_categoria, nuovi_ingredienti, nuovo_procedimento, nuova_curiosita, nuovo_url, img_path, item_id))
                         conn.commit()
                         conn.close()
                         st.success("Ricetta aggiornata con successo! Ricarica la pagina.")
