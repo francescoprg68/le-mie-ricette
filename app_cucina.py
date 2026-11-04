@@ -125,9 +125,15 @@ def imposta_stile_grafico():
 
 imposta_stile_grafico()
 
-# Intitolazione con stile ricettario antico
-st.markdown("<h1 style='text-align: center; color: #7A3B12; font-family: Georgia, serif;'>🍳 Il Mio Ricettario di Casa 📖</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #6E5B4D; font-style: italic; font-size: 1.15rem; margin-bottom: 35px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
+# Intitolazione con stile ricettario antico, grande e perfettamente bilanciato
+st.markdown("""
+    <div style="text-align: center; margin-top: 20px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;">
+        <span style="font-size: 2.2rem; line-height: 1;">👨‍🍳 🥖 🧄</span>
+        <span style="font-family: Georgia, serif; color: #7A3B12; font-size: 3rem; font-weight: bold; letter-spacing: 1px;">Il Mio Ricettario di Casa</span>
+        <span style="font-size: 2.2rem; line-height: 1;">🍋 🍷 🥐</span>
+    </div>
+""", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #6E5B4D; font-style: italic; font-size: 1.2rem; margin-bottom: 35px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
 
 # --- INIZIALIZZAZIONE DATABASE SQLITE ---
 def get_connection():
@@ -409,6 +415,41 @@ if st.session_state.pagina_corrente == "🏠 Home":
         if st.button("👉 Apri Altro", use_container_width=True, key="btn_alt"):
             st.session_state.pagina_corrente = "🍹 Altro"
             st.rerun()
+
+    # --- FASCIA DECORATIVA COLORATA IN BASSO (Icone SVG stilizzate) ---
+    st.markdown("""
+        <div style="
+            background-color: #EBDCB9; 
+            padding: 16px; 
+            border-radius: 14px; 
+            text-align: center; 
+            margin-top: 30px; 
+            margin-bottom: 20px;
+            border: 2px dashed #B8860B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        ">
+            <!-- Posate / Cucina -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            <!-- Cappello Chef -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.8a4.5 4.5 0 1 1 2.6-8.3 4.5 4.5 0 0 1 6.8 0 4.5 4.5 0 1 1 2.6 8.3"/><path d="M6 17h12"/><path d="M6 21h12"/></svg>
+            <!-- Calice Vino -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5Z"/></svg>
+            <!-- Formaggio / Cibo -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 11 3l10 8"/><path d="M3 11v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="16" r="1.5"/></svg>
+            <!-- Mela / Frutta -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.91 4.91 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+            <!-- Pizza / Trancio -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20L2 16z"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
+            <!-- Calice Vino -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5Z"/></svg>
+            <!-- Posate / Cucina -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+        </div>
+    """, unsafe_allow_html=True)
 
 elif st.session_state.pagina_corrente == "🥗 Antipasti":
     mostra_categoria("Antipasti")
