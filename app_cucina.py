@@ -43,14 +43,14 @@ def save_uploaded_image(immagine_file):
             return ""
     return ""
 
-# --- CONFIGURAZIONE GRAFICA RICETTARIO ARTIGIANALE E CALDO ---
+# --- CONFIGURAZIONE GRAFICA ROSSO TENUE E CALDO ---
 def imposta_stile_grafico():
     stile_css = """
     <style>
-    /* Sfondo generale stile carta da cucina retrò */
+    /* Sfondo generale carta da cucina rosata tenue */
     .stApp {
-        background-color: #F7F1E3 !important;
-        background-image: radial-gradient(#E8DFC9 0.75px, transparent 0.75px);
+        background-color: #FDF6F0 !important;
+        background-image: radial-gradient(#EAD5CE 0.75px, transparent 0.75px);
         background-size: 15px 15px;
     }
     
@@ -59,30 +59,30 @@ def imposta_stile_grafico():
         display: none;
     }
     
-    /* Contenitore principale stile quaderno di ricette */
+    /* Contenitore principale in rosso cipria tenue (zero bianco freddo) */
     div.block-container {
-        background-color: #FFFCF6;
+        background-color: #FDF2F0;
         padding: 35px;
         border-radius: 20px;
-        border: 2px solid #D2B48C;
+        border: 2px solid #D98880;
         margin-top: 20px;
         margin-bottom: 30px;
-        box-shadow: 0 12px 30px rgba(139, 69, 19, 0.08);
+        box-shadow: 0 12px 30px rgba(192, 57, 43, 0.08);
     }
     
-    /* Tipografia calda ed elegante per titoli */
+    /* Tipografia elegante per titoli (rosso bordeaux) */
     h1, h2, h3, h4 {
         font-family: 'Georgia', serif !important;
-        color: #7A3B12 !important;
+        color: #900C3F !important;
     }
 
     /* Dimensione testo base leggibile */
     html, body, [class*="st-"] {
         font-size: 1.1rem !important;
-        color: #3B2F2F !important;
+        color: #2C3E50 !important;
     }
 
-    /* Immagini ricette con cornice stile polaroid/ricetta */
+    /* Immagini ricette con cornice coordinata */
     div[data-testid="stImage"] img {
         max-height: 400px !important;
         width: auto !important;
@@ -92,18 +92,18 @@ def imposta_stile_grafico():
         display: block;
         margin-left: auto;
         margin-right: auto;
-        background-color: #FFFDF9;
+        background-color: #FDF2F0;
         padding: 8px;
-        border: 2px solid #D2B48C;
+        border: 2px solid #D98880;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    /* Pulsanti caldi color terracotta artigianale */
+    /* Pulsanti rossi/terracotta coordinati */
     .stButton button {
         opacity: 1 !important;
-        background-color: #F4E8D8 !important;
-        color: #7A3B12 !important;
-        border: 2px solid #C49A6C !important;
+        background-color: #FADBD8 !important;
+        color: #900C3F !important;
+        border: 2px solid #D98880 !important;
         font-weight: bold !important;
         border-radius: 12px !important;
         padding: 10px 20px !important;
@@ -113,11 +113,11 @@ def imposta_stile_grafico():
     }
     
     .stButton button:hover {
-        background-color: #A0522D !important;
+        background-color: #C0392B !important;
         color: #FFFFFF !important;
-        border-color: #A0522D !important;
+        border-color: #C0392B !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(160, 82, 45, 0.2);
+        box-shadow: 0 4px 10px rgba(192, 57, 43, 0.2);
     }
     </style>
     """
@@ -125,15 +125,38 @@ def imposta_stile_grafico():
 
 imposta_stile_grafico()
 
-# Intitolazione con stile ricettario antico, grande e perfettamente bilanciato
-st.markdown("""
-    <div style="text-align: center; margin-top: 20px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;">
-        <span style="font-size: 2.2rem; line-height: 1;">👨‍🍳 🥖 🧄</span>
-        <span style="font-family: Georgia, serif; color: #7A3B12; font-size: 3rem; font-weight: bold; letter-spacing: 1px;">Il Mio Ricettario di Casa</span>
-        <span style="font-size: 2.2rem; line-height: 1;">🍋 🍷 🥐</span>
+# --- FUNZIONE AUSILIARIA PER CONVERTIRE GLI STEMMI IN BASE64 ---
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return ""
+
+stemma_sx_path = os.path.join(BASE_DIR, "stemma_sinistra.png")
+stemma_dx_path = os.path.join(BASE_DIR, "stemma_destra.png")
+
+stemma_sx_base64 = get_base64_image(stemma_sx_path)
+stemma_dx_base64 = get_base64_image(stemma_dx_path)
+
+if stemma_sx_base64:
+    stemma_sx_html = f'<img src="data:image/png;base64,{stemma_sx_base64}" style="height: 60px; width: auto; vertical-align: middle; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">'
+else:
+    stemma_sx_html = '🛡️'
+
+if stemma_dx_base64:
+    stemma_dx_html = f'<img src="data:image/png;base64,{stemma_dx_base64}" style="height: 60px; width: auto; vertical-align: middle; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">'
+else:
+    stemma_dx_html = '🛡️'
+
+# Intitolazione con i due stemmi indipendenti ai lati
+st.markdown(f"""
+    <div style="text-align: center; margin-top: 20px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 20px;">
+        {stemma_sx_html}
+        <span style="font-family: Georgia, serif; color: #900C3F; font-size: 3rem; font-weight: bold; letter-spacing: 1px;">Il Mio Ricettario di Casa</span>
+        {stemma_dx_html}
     </div>
 """, unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #6E5B4D; font-style: italic; font-size: 1.2rem; margin-bottom: 35px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #7B7D7D; font-style: italic; font-size: 1.2rem; margin-bottom: 35px;'>I piatti della tradizione e i sapori di una volta, sempre a portata di mano.</p>", unsafe_allow_html=True)
 
 # --- INIZIALIZZAZIONE DATABASE SQLITE ---
 def get_connection():
@@ -207,8 +230,8 @@ def mostra_categoria(nome_categoria):
                 
                 # TITOLO DELLA RICETTA IN UN ELEGANTE CARTONCINO IN EVIDENZA
                 st.markdown(f"""
-                    <div style="background-color: #FFFDF9; padding: 25px; border-radius: 16px; border: 2px solid #D2B48C; text-align: center; margin: 25px 0; box-shadow: 0 4px 12px rgba(139,69,19,0.06);">
-                        <span style="font-family: Georgia, serif; color: #7A3B12; font-size: 3.2rem; font-weight: bold; letter-spacing: 1px; display: block;">{titolo}</span>
+                    <div style="background-color: #FDF2F0; padding: 25px; border-radius: 16px; border: 2px solid #D98880; text-align: center; margin: 25px 0; box-shadow: 0 4px 12px rgba(192,57,43,0.06);">
+                        <span style="font-family: Georgia, serif; color: #900C3F; font-size: 3.2rem; font-weight: bold; letter-spacing: 1px; display: block;">{titolo}</span>
                     </div>
                 """, unsafe_allow_html=True)
                 
@@ -236,7 +259,7 @@ def mostra_categoria(nome_categoria):
                     st.rerun()
                 return
 
-        st.markdown("<p style='color: #6E5B4D; font-style: italic;'>Clicca su una ricetta per leggerla:</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #7B7D7D; font-style: italic;'>Clicca su una ricetta per leggerla:</p>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
 
         for i in range(0, len(ricette), 2):
@@ -349,8 +372,8 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col1:
         st.markdown(
             f"""
-            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
-                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🥗 Antipasti</h4>
+            <div style="border: 2px solid #D98880; background: #FDF2F0; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(192,57,43,0.04);">
+                <h4 style="margin:0; color: #900C3F; font-size: 1.15rem; font-family: Georgia, serif;">🥗 Antipasti</h4>
                 <p style="font-size: 1.3rem; font-weight: bold; color: #2e7d32; margin: 14px 0 0 0;">{num_ant} inseriti</p>
             </div>
             """,
@@ -363,8 +386,8 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col2:
         st.markdown(
             f"""
-            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
-                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🍝 Primi</h4>
+            <div style="border: 2px solid #D98880; background: #FDF2F0; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(192,57,43,0.04);">
+                <h4 style="margin:0; color: #900C3F; font-size: 1.15rem; font-family: Georgia, serif;">🍝 Primi</h4>
                 <p style="font-size: 1.3rem; font-weight: bold; color: #00838f; margin: 14px 0 0 0;">{num_pri} inseriti</p>
             </div>
             """,
@@ -377,8 +400,8 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col3:
         st.markdown(
             f"""
-            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
-                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🥩 Secondi</h4>
+            <div style="border: 2px solid #D98880; background: #FDF2F0; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(192,57,43,0.04);">
+                <h4 style="margin:0; color: #900C3F; font-size: 1.15rem; font-family: Georgia, serif;">🥩 Secondi</h4>
                 <p style="font-size: 1.3rem; font-weight: bold; color: #c62828; margin: 14px 0 0 0;">{num_sec} inseriti</p>
             </div>
             """,
@@ -391,8 +414,8 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col4:
         st.markdown(
             f"""
-            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
-                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🍰 Dolci</h4>
+            <div style="border: 2px solid #D98880; background: #FDF2F0; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(192,57,43,0.04);">
+                <h4 style="margin:0; color: #900C3F; font-size: 1.15rem; font-family: Georgia, serif;">🍰 Dolci</h4>
                 <p style="font-size: 1.3rem; font-weight: bold; color: #f57f17; margin: 14px 0 0 0;">{num_dol} inseriti</p>
             </div>
             """,
@@ -405,8 +428,8 @@ if st.session_state.pagina_corrente == "🏠 Home":
     with col5:
         st.markdown(
             f"""
-            <div style="border: 2px solid #D2B48C; background: #FFFDF9; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(139,69,19,0.04);">
-                <h4 style="margin:0; color: #7A3B12; font-size: 1.15rem; font-family: Georgia, serif;">🍹 Altro</h4>
+            <div style="border: 2px solid #D98880; background: #FDF2F0; padding: 22px; border-radius: 16px; text-align: center; height: 135px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(192,57,43,0.04);">
+                <h4 style="margin:0; color: #900C3F; font-size: 1.15rem; font-family: Georgia, serif;">🍹 Altro</h4>
                 <p style="font-size: 1.3rem; font-weight: bold; color: #6a1b9a; margin: 14px 0 0 0;">{num_alt} inseriti</p>
             </div>
             """,
@@ -416,38 +439,38 @@ if st.session_state.pagina_corrente == "🏠 Home":
             st.session_state.pagina_corrente = "🍹 Altro"
             st.rerun()
 
-    # --- FASCIA DECORATIVA COLORATA IN BASSO (Icone SVG stilizzate) ---
+    # --- FASCIA DECORATIVA IN BASSO (Rosso terracotta coordinato) ---
     st.markdown("""
         <div style="
-            background-color: #EBDCB9; 
+            background-color: #FADBD8; 
             padding: 16px; 
             border-radius: 14px; 
             text-align: center; 
             margin-top: 30px; 
             margin-bottom: 20px;
-            border: 2px dashed #B8860B;
+            border: 2px dashed #C0392B;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 22px;
             flex-wrap: wrap;
         ">
-            <!-- Posate / Cucina -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            <!-- Posate -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#900C3F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
             <!-- Cappello Chef -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.8a4.5 4.5 0 1 1 2.6-8.3 4.5 4.5 0 0 1 6.8 0 4.5 4.5 0 1 1 2.6 8.3"/><path d="M6 17h12"/><path d="M6 21h12"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.8a4.5 4.5 0 1 1 2.6-8.3 4.5 4.5 0 0 1 6.8 0 4.5 4.5 0 1 1 2.6 8.3"/><path d="M6 17h12"/><path d="M6 21h12"/></svg>
             <!-- Calice Vino -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5Z"/></svg>
-            <!-- Formaggio / Cibo -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 11 3l10 8"/><path d="M3 11v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="16" r="1.5"/></svg>
-            <!-- Mela / Frutta -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.91 4.91 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
-            <!-- Pizza / Trancio -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20L2 16z"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#78281F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5Z"/></svg>
+            <!-- Formaggio -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B7950B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 11 3l10 8"/><path d="M3 11v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="16" r="1.5"/></svg>
+            <!-- Frutta -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1E8449" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.91 4.91 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+            <!-- Pizza -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#BA4A00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20L2 16z"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
             <!-- Calice Vino -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5Z"/></svg>
-            <!-- Posate / Cucina -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B4513" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#78281F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5V3H7v7a5 5 0 0 0 5 5Z"/></svg>
+            <!-- Posate -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#900C3F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
         </div>
     """, unsafe_allow_html=True)
 
