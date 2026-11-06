@@ -312,7 +312,7 @@ if st.session_state.pagina_corrente == "🏠 Home":
                     chiudi_inline = col_f2.form_submit_button("Chiudi", use_container_width=True)
                     
                     if submit_inline:
-                        if password_inserita == "1234":
+                        if password_inserita == st.secrets["password_amministratore"]:
                             st.session_state.autenticato = True
                             st.session_state.mostra_login_inline = False
                             st.success("Accesso effettuato!")
